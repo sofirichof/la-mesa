@@ -1,14 +1,15 @@
 /* ============ NOCHE Y MEDIA — one production day ============
-   The world is the hour. Scroll moves the sun. Ends at 1:30am. */
+   The world is the hour. Scroll moves the sun. Ends at 1:30am.
+   English by default; the seal switches the whole site to Spanish. */
 
 :root{
   --paper:#FAF5DD; --paper2:#F3E9CE; --sand:#D8C6B0;
   --ink:#2A1F1B; --red:#9D2729; --cobalt:#2244AA; --pink:#C36560;
 
   /* set by world.js from scroll position */
-  --sky1:#E8B7A0; --sky2:#FAF5DD;      /* sky gradient, dawn defaults */
-  --sun:1; --lamp:0;                    /* light amounts */
-  --amb:#2A1F1B;                        /* ambient text color on the sky */
+  --sky1:#E8B7A0; --sky2:#FAF5DD;
+  --sun:1; --lamp:0;
+  --amb:#2A1F1B;
   --amb-dim:rgba(42,31,27,.62);
   --shx:8px; --shy:12px; --sha:.28;
 }
@@ -24,15 +25,22 @@ button{font:inherit; color:inherit; background:none; border:none; cursor:pointer
 a{color:var(--red)}
 ::selection{background:var(--cobalt); color:var(--paper)}
 
+/* ============ language: one at a time ============ */
+.es{display:none}
+html.es .es{display:block}
+html.es .en-txt{display:none}
+span.es, b.es, i.es{display:none}
+html.es span.es, html.es b.es, html.es i.es{display:inline}
+html.es span.en-txt, html.es b.en-txt, html.es i.en-txt{display:none}
+
 /* ============ the sky & the two bodies ============ */
 #cielo{
   position:fixed; inset:0; z-index:-3;
   background:linear-gradient(180deg, var(--sky1), var(--sky2));
   transition:background .2s linear;
 }
-/* stars come out with the lamp */
 #cielo::after{
-  content:""; position:absolute; inset:0; opacity:calc(var(--lamp) * .9);
+  content:""; position:absolute; inset:0; opacity:calc(var(--stars, 0) * .9);
   background-image:
     radial-gradient(rgba(255,255,255,.85) 1px, transparent 1.7px),
     radial-gradient(rgba(200,212,255,.55) 1px, transparent 1.5px),
@@ -41,6 +49,16 @@ a{color:var(--red)}
   background-position:17px 23px, 67px 91px, 41px 11px;
   mask-image:linear-gradient(180deg, #000 55%, transparent);
 }
+
+/* call-sheet hover: the work replaces the sky for a moment */
+#still-layer{
+  position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background-size:cover; background-position:center;
+  opacity:0; transform:scale(1.04);
+  transition:opacity .45s ease, transform 1.4s ease;
+}
+#still-layer.show{opacity:.92; transform:scale(1)}
+
 #sol{
   position:fixed; z-index:-2; width:92px; height:92px; border-radius:50%;
   background:radial-gradient(circle at 42% 38%, #FFE9B8, #E8A33D 62%, #D96C4F);
@@ -67,7 +85,7 @@ html.eclipse #luna{filter:drop-shadow(0 0 50px rgba(120,150,255,.65))}
 
 #grain{position:fixed; inset:0; width:100%; height:100%; pointer-events:none; opacity:.055; z-index:60; mix-blend-mode:multiply}
 
-/* ============ the clock & the seal (fixed instruments) ============ */
+/* ============ fixed instruments ============ */
 #reloj{
   position:fixed; left:18px; top:16px; z-index:70;
   font-family:'Space Mono',monospace; color:var(--amb);
@@ -77,51 +95,49 @@ html.eclipse #luna{filter:drop-shadow(0 0 50px rgba(120,150,255,.65))}
 #reloj-l{font-size:9px; letter-spacing:.28em; opacity:.65}
 
 #sello{
-  position:fixed; right:18px; bottom:18px; z-index:70; width:64px; height:64px;
+  position:fixed; right:18px; bottom:18px; z-index:70; width:60px;
   color:var(--cobalt); filter:drop-shadow(2px 3px 5px rgba(0,0,0,.3));
-  transition:transform .5s cubic-bezier(.22,1,.36,1); touch-action:none;
+  display:flex; flex-direction:column; align-items:center; gap:3px;
+  transition:transform .5s cubic-bezier(.22,1,.36,1);
 }
 #sello:hover{transform:rotate(8deg)}
-#sello:focus-visible{outline:2.5px solid var(--red); border-radius:50%; outline-offset:3px}
-#sello svg{width:100%; height:100%}
+#sello:focus-visible{outline:2.5px solid var(--red); border-radius:8px; outline-offset:3px}
+#sello svg{width:56px; height:56px}
 #sello .sello-hueco{fill:var(--sky2); transition:fill .2s linear}
-html.lens #sello{color:var(--red)}
-html.lens::after{
-  content:""; position:fixed; inset:0; pointer-events:none; z-index:80;
-  box-shadow:inset 0 0 0 5px var(--cobalt);
+#sello-lang{
+  font-family:'Space Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.18em;
+  color:var(--amb); background:transparent;
 }
-
-/* ============ la otra mitad ============ */
-.es{display:none}
-html.lens .es{display:block}
-html.lens .en-txt{display:none}
-.note{
-  font-family:Caveat, cursive; font-size:21px; color:var(--cobalt);
-  transform:rotate(-1.2deg); margin-top:10px;
-  opacity:0; max-height:0; overflow:hidden; transition:opacity .25s, max-height .25s;
-}
-html.lens .note{opacity:1; max-height:90px}
 
 /* ============ the hours ============ */
 main{position:relative; z-index:1}
 .hora{min-height:148vh; display:flex; align-items:center; padding:16vh 24px}
 .hora .col{max-width:660px; margin:0 auto; width:100%}
+.hora .col.ancha{max-width:860px}
 .hora .col.centrado{text-align:center}
 
 .marca{
   font-family:'Space Mono',monospace; font-size:11px; font-weight:700;
   letter-spacing:.3em; color:var(--red); margin-bottom:14px;
 }
+body.noche .marca{color:#D98A7E}
 h1{font-size:clamp(52px,9vw,96px); line-height:.95; font-weight:640; letter-spacing:-.015em;
   font-variation-settings:'opsz' 144; margin-bottom:20px; text-wrap:balance; color:var(--amb)}
 h2{font-size:clamp(34px,5.5vw,54px); line-height:1; font-weight:620; letter-spacing:-.01em;
   margin-bottom:22px; text-wrap:balance; color:var(--amb)}
-h2 .gloss{font-size:.42em; font-weight:400; font-style:italic; color:var(--amb-dim); letter-spacing:0}
 h2.grande{font-size:clamp(44px,7vw,76px)}
 .lede{font-size:20px; line-height:1.55; max-width:560px; margin-bottom:14px; color:var(--amb)}
 .centrado .lede{margin-left:auto; margin-right:auto}
-.hint{font-size:13px; font-style:italic; color:var(--amb-dim); margin-top:16px}
 .pie{font-family:'Space Mono',monospace; font-size:11px; letter-spacing:.24em; color:var(--amb-dim); margin-top:44px}
+
+/* hero cutouts — the work shows up before a word is read */
+.cutouts{display:flex; flex-wrap:wrap; gap:14px; align-items:flex-start; margin:26px 0 10px}
+.cutouts img{
+  width:var(--w, 180px); max-width:42vw; height:auto;
+  border:1.5px solid var(--ink); background:var(--paper); padding:5px 5px 16px;
+  transform:rotate(calc(var(--r, 0) * 1deg));
+  filter:drop-shadow(var(--shx) var(--shy) 12px rgba(15,8,4,var(--sha))) saturate(.92);
+}
 
 /* papers */
 .p{
@@ -129,11 +145,10 @@ h2.grande{font-size:clamp(44px,7vw,76px)}
   padding:18px 20px; margin:22px 0;
   filter:drop-shadow(var(--shx) var(--shy) 14px rgba(15,8,4,var(--sha)));
 }
-.p:nth-of-type(odd){transform:rotate(-.7deg)} .p:nth-of-type(even){transform:rotate(.6deg)}
+.p:nth-of-type(odd){transform:rotate(-.6deg)} .p:nth-of-type(even){transform:rotate(.5deg)}
 
-/* reveal on scroll */
 @media (prefers-reduced-motion:no-preference){
-  .p,.recibo,.monitor{opacity:0; translate:0 26px; transition:opacity .9s ease, translate .9s cubic-bezier(.22,1,.36,1)}
+  .p,.recibo,.monitor,.cutouts{opacity:0; translate:0 26px; transition:opacity .9s ease, translate .9s cubic-bezier(.22,1,.36,1)}
   .in{opacity:1; translate:0 0}
 }
 
@@ -143,59 +158,84 @@ h2.grande{font-size:clamp(44px,7vw,76px)}
 .exp .exp-head span{font-family:'Space Mono',monospace; font-size:9.5px; letter-spacing:.12em; color:var(--red); white-space:nowrap; text-align:right}
 .exp p{font-size:14.5px; line-height:1.5}
 .exp.chica p{font-size:13.5px}
-.exp .still{height:150px; border:1px solid var(--ink); margin-bottom:11px;
-  background:repeating-linear-gradient(45deg, rgba(42,31,27,.13) 0 2px, transparent 2px 6px), var(--sand)}
-.exp .still.pink{background:repeating-linear-gradient(45deg, rgba(157,39,41,.14) 0 2px, transparent 2px 6px), #E9C2BC}
+.still-img{
+  width:100%; height:auto; display:block; border:1px solid var(--ink); margin-bottom:11px;
+  filter:saturate(.95);
+}
+.still-img.retrato{max-width:320px}
 .laurel{margin-top:10px; font-family:'Space Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.14em;
   color:var(--cobalt); border:1.5px solid var(--cobalt); display:inline-block; padding:4px 8px; transform:rotate(-1deg)}
 
-/* receipts — real timestamps from the record */
+/* pull-quotes with timestamps — like reviews */
 .recibo{
   font-family:'Space Mono',monospace; font-size:13px; line-height:1.5; color:var(--amb);
   border-left:3px solid var(--cobalt); padding:6px 0 6px 14px; margin:26px 0 26px 6px;
   transform:rotate(-.4deg); max-width:540px;
 }
 .recibo span{display:block; font-size:10px; font-weight:700; letter-spacing:.2em; color:var(--cobalt); margin-bottom:3px}
+body.noche .recibo span{color:#9FB0E8}
 .recibo i{display:block; font-size:11px; font-style:italic; color:var(--amb-dim); margin-top:3px; font-family:Fraunces,serif}
 
 /* call sheet */
 .callsheet{font-family:'Space Mono',monospace; padding:14px 16px}
 .cs-head{font-size:11px; font-weight:700; letter-spacing:.22em; color:var(--red);
-  border-bottom:1.6px solid var(--ink); padding-bottom:7px; margin-bottom:4px; display:flex; gap:10px; align-items:baseline}
-.cs-head .en-txt,.cs-head .es{font-weight:400; font-size:9px; letter-spacing:.14em; opacity:.55; text-transform:uppercase}
+  border-bottom:1.6px solid var(--ink); padding-bottom:7px; margin-bottom:4px}
 .callsheet a{
   display:grid; grid-template-columns:52px 1fr auto; gap:12px; align-items:baseline;
-  padding:8px 2px; border-bottom:1px solid rgba(42,31,27,.25); text-decoration:none; color:var(--ink);
+  padding:9px 2px; border-bottom:1px solid rgba(42,31,27,.25); text-decoration:none; color:var(--ink);
 }
 .callsheet a:last-child{border-bottom:none}
 .callsheet a span{font-size:11px; font-weight:700; color:var(--red); font-variant-numeric:tabular-nums}
 .callsheet a b{font-size:12px; letter-spacing:.1em}
-.callsheet a i{font-size:10px; font-style:italic; opacity:.55; font-family:Fraunces,serif}
-.callsheet a:hover{background:rgba(157,39,41,.07)}
+.callsheet a i{font-size:10px; font-style:italic; opacity:.55; font-family:Fraunces,serif; text-align:right}
+.callsheet a:hover,.callsheet a:focus-visible{background:rgba(157,39,41,.07); outline:none}
 
-/* monitor */
-.monitor{max-width:560px; margin:26px auto}
+/* the full record — every credit, ruled like a ledger */
+.sheet{font-family:'Space Mono',monospace; padding:14px 16px}
+.sheet table{border-collapse:collapse; width:100%}
+.sheet td{font-size:11px; padding:6px 8px 5px 0; border-bottom:1px solid rgba(42,31,27,.25); letter-spacing:.02em; vertical-align:baseline}
+.sheet tr:last-child td{border-bottom:none}
+.sheet td:first-child{color:var(--red); font-weight:700; white-space:nowrap; width:48px}
+.sheet td:nth-child(2){font-family:Fraunces,serif; font-size:14px}
+.sheet td:nth-child(3){white-space:nowrap; letter-spacing:.1em; font-size:9.5px; color:var(--cobalt); font-weight:700}
+.sheet td:last-child{opacity:.6; font-style:italic; font-family:Fraunces,serif; font-size:11.5px}
+.sheet tr[data-still]{cursor:default}
+.sheet tr:hover td{background:rgba(157,39,41,.06)}
+
+/* studio s */
+.ss-row{display:flex; gap:16px; align-items:flex-start}
+.ss-icon{width:96px; height:96px; flex:none; border:1.5px solid var(--ink); border-radius:18px; background:#fff}
+.ss-note{margin-top:10px; font-family:'Space Mono',monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--cobalt); border-top:1px dashed rgba(42,31,27,.35); padding-top:8px}
+
+/* monitor & tonight's program */
+.monitor{max-width:600px; margin:26px auto}
 .mon-screen{position:relative; aspect-ratio:16/9; background:#0B0B0B; border:12px solid #23201C; border-radius:8px; overflow:hidden;
   filter:drop-shadow(0 18px 40px rgba(0,0,0,.45))}
 .bars{position:absolute; inset:0; display:flex; opacity:.9}
 .bars i{flex:1} .bars i:nth-child(1){background:#c8c8c0}.bars i:nth-child(2){background:#c8c832}.bars i:nth-child(3){background:#32c8c8}
 .bars i:nth-child(4){background:#32c832}.bars i:nth-child(5){background:#c832c8}.bars i:nth-child(6){background:#c83232}.bars i:nth-child(7){background:#3232c8}
-.mon-screen iframe{position:absolute; inset:0; width:100%; height:100%; border:0}
+.mon-screen iframe,.mon-screen video{position:absolute; inset:0; width:100%; height:100%; border:0; background:#000; z-index:2}
 .mon-play{
-  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:2;
-  font-family:'Space Mono',monospace; font-weight:700; font-size:14px; letter-spacing:.14em;
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:1;
+  font-family:'Space Mono',monospace; font-weight:700; font-size:12.5px; letter-spacing:.12em;
   color:#fff; background:rgba(0,0,0,.72); padding:11px 16px; border:1.5px solid #fff;
 }
-.mon-play:hover{background:var(--red)}
 .mon-off{position:absolute; right:8px; bottom:8px; z-index:3; font-family:'Space Mono',monospace;
   font-weight:700; font-size:9px; letter-spacing:.16em; color:#fff;
   background:rgba(0,0,0,.75); border:1px solid rgba(255,255,255,.7); padding:5px 8px}
 .mon-off:hover{background:var(--red)}
-.mon-cap{font-size:13px; font-style:italic; color:var(--amb-dim); text-align:center; margin-top:12px}
+.programa{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; justify-content:center}
+.programa button{
+  font-family:'Space Mono',monospace; font-size:10.5px; font-weight:700; letter-spacing:.1em;
+  color:var(--amb); border:1.5px solid var(--amb); padding:8px 11px; border-radius:2px;
+  transition:background .3s, color .3s;
+}
+.programa button:hover,.programa button.on{background:var(--red); border-color:var(--red); color:#fff}
 
 /* eclipse & nym */
 #h-eclipse{min-height:220vh}
-#h-eclipse .col{margin-top:105vh}   /* the sky speaks first; the words arrive after */
+#h-eclipse .col{margin-top:105vh}
 #nym-marca{width:150px; margin:0 auto 8px; color:var(--cobalt)}
 #nym-marca svg{width:100%}
 #nym-marca .nym-hueco{fill:var(--sky2); transition:fill .2s linear}
@@ -206,8 +246,8 @@ h2.grande{font-size:clamp(44px,7vw,76px)}
   font-family:'Space Mono',monospace; font-size:10px; letter-spacing:.06em; color:rgba(42,31,27,.7)}
 
 /* midnight city dots */
-#h-imagen{position:relative}
-#h-imagen::before{
+#h-fondo{position:relative}
+#h-fondo::before{
   content:""; position:absolute; inset:auto 0 0 0; height:38vh; pointer-events:none; opacity:.5;
   background-image:radial-gradient(rgba(255,220,140,.7) 1px, transparent 1.6px), radial-gradient(rgba(255,220,140,.4) 1px, transparent 1.6px);
   background-size:63px 37px, 41px 53px; background-position:0 0, 20px 12px;
@@ -221,8 +261,11 @@ h2.grande{font-size:clamp(44px,7vw,76px)}
   .exp .exp-head{flex-direction:column; gap:2px}
   .exp .exp-head span{text-align:left}
   #sol{width:64px; height:64px} #luna{width:84px; height:84px}
+  .cutouts img{max-width:44vw}
+  .sheet td:last-child{display:none}
 }
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   .bars{animation:none}
+  #still-layer{transition:none}
 }

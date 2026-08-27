@@ -1,6 +1,7 @@
 /* ============ NOCHE Y MEDIA — the day engine ============
-   Scroll is the hour. The sky, the sun, the moon, and the clock
-   all derive from one number: h (6.2 → 25.5, i.e. 06:12 → 01:30). */
+   Scroll is the hour. Sky, light, clock, sun, and moon all derive
+   from one number: h (06:12 → 01:30). English by default; the seal
+   switches the whole site to Spanish — one language at a time. */
 
 (() => {
   const root = document.documentElement;
@@ -8,27 +9,27 @@
 
   const DAY_START = 6.2, DAY_END = 25.5;
 
-  /* ---------- sky keyframes: [hour, skyTop, skyBottom, ambientInk?, sunAmount] ---------- */
+  /* ---------- sky keyframes: [hour, skyTop, skyBottom, sunAmount] ---------- */
   const SKY = [
-    [6.2,  '#D98A7E', '#F3D9B8', true,  0.35],   // primera luz
-    [8.5,  '#E8CFAE', '#FAF5DD', true,  0.85],   // morning paper
-    [11.0, '#EADFC0', '#FAF5DD', true,  1.0 ],   // midday — the sky is paper
-    [15.0, '#E4D2A8', '#F7EDD2', true,  1.0 ],   // afternoon
-    [17.75,'#E8A33D', '#E9C28F', true,  0.9 ],   // hora dorada
-    [19.63,'#C36560', '#4A4A7E', false, 0.45],   // el eclipse — dusk
-    [21.0, '#2A3260', '#1E2749', false, 0.1 ],   // la función
-    [24.0, '#161D3E', '#10142A', false, 0.0 ],   // medianoche
-    [25.5, '#0C1024', '#090C1E', false, 0.0 ],   // noche y media
+    [6.2,  '#D98A7E', '#F3D9B8', 0.35],
+    [8.5,  '#E8CFAE', '#FAF5DD', 0.85],
+    [11.0, '#EADFC0', '#FAF5DD', 1.0 ],
+    [15.0, '#E4D2A8', '#F7EDD2', 1.0 ],
+    [17.75,'#E8A33D', '#E9C28F', 0.9 ],
+    [19.63,'#C36560', '#4A4A7E', 0.45],
+    [21.0, '#2A3260', '#1E2749', 0.1 ],
+    [24.0, '#161D3E', '#10142A', 0.0 ],
+    [25.5, '#0C1024', '#090C1E', 0.0 ],
   ];
 
   const lerp = (a, b, t) => a + (b - a) * t;
+  const ease = t => t * t * (3 - 2 * t);
   const hexLerp = (c1, c2, t) => {
-    const p = h => [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)];
+    const p = x => [parseInt(x.slice(1,3),16), parseInt(x.slice(3,5),16), parseInt(x.slice(5,7),16)];
     const [r1,g1,b1] = p(c1), [r2,g2,b2] = p(c2);
     return `rgb(${Math.round(lerp(r1,r2,t))},${Math.round(lerp(g1,g2,t))},${Math.round(lerp(b1,b2,t))})`;
   };
 
-  /* ---------- fixed instruments ---------- */
   const sol = document.getElementById('sol');
   const luna = document.getElementById('luna');
   const relojH = document.getElementById('reloj-h');
@@ -36,7 +37,6 @@
   const moth = document.getElementById('polilla');
   const zones = [...document.querySelectorAll('.hora')];
 
-  /* build the nym mark rays */
   const nymRays = document.getElementById('nym-rays');
   if (nymRays) for (let i = 0; i < 12; i++) {
     const p = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
@@ -49,10 +49,9 @@
     const hh = Math.floor(h) % 24, mm = Math.round((h % 1) * 60) % 60;
     return String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0');
   }
+  const esOn = () => root.classList.contains('es');
 
-  /* ---------- hour anchors: each section's top IS its hour ----------
-     Content heights vary by viewport, so the hour is interpolated between
-     section offsets rather than mapped uniformly to the scrollbar. */
+  /* ---------- hour anchors: each section's top IS its hour ---------- */
   let MAP = [];
   function buildMap() {
     const max = document.documentElement.scrollHeight - innerHeight;
@@ -63,7 +62,7 @@
   addEventListener('resize', () => { buildMap(); update(); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { buildMap(); update(); });
 
-  /* ---------- the master update: scroll → hour → world ---------- */
+  /* ---------- the master update ---------- */
   let ticking = false;
   function update() {
     ticking = false;
@@ -79,15 +78,14 @@
     while (i < SKY.length - 2 && h > SKY[i + 1][0]) i++;
     const a = SKY[i], b = SKY[i + 1];
     const t = Math.min(1, Math.max(0, (h - a[0]) / (b[0] - a[0])));
-    const sky1 = hexLerp(a[1], b[1], t), sky2 = hexLerp(a[2], b[2], t);
-    const sun = lerp(a[4], b[4], t);
-    root.style.setProperty('--sky1', sky1);
-    root.style.setProperty('--sky2', sky2);
+    const sun = lerp(a[3], b[3], t);
+    root.style.setProperty('--sky1', hexLerp(a[1], b[1], t));
+    root.style.setProperty('--sky2', hexLerp(a[2], b[2], t));
     root.style.setProperty('--sun', sun.toFixed(3));
     root.style.setProperty('--lamp', (1 - sun).toFixed(3));
     root.style.setProperty('--sha', (0.16 + 0.16 * sun).toFixed(3));
+    root.style.setProperty('--stars', Math.max(0, ((1 - sun) - 0.75) / 0.25).toFixed(3));
 
-    /* ambient text: ink while the sky is bright, paper once it darkens */
     const dayInk = sun > 0.55;
     root.style.setProperty('--amb', dayInk ? '#2A1F1B' : '#F3ECD8');
     root.style.setProperty('--amb-dim', dayInk ? 'rgba(42,31,27,.62)' : 'rgba(243,236,216,.65)');
@@ -95,37 +93,35 @@
 
     /* the clock */
     relojH.textContent = fmtHour(h);
-    let label = zones[0].dataset.label;
-    for (const z of zones) if (h >= parseFloat(z.dataset.hour) - 0.9) label = z.dataset.label;
-    relojL.textContent = label;
+    const zc = zones[Math.min(k, zones.length - 1)];
+    relojL.textContent = zc.dataset[esOn() ? 'labelEs' : 'labelEn'] || zc.dataset.labelEn;
 
-    /* ---------- the sun: rises at 6.2, sets by 20.2 ---------- */
+    /* the sun */
     const sunUp = h >= 6 && h <= 20.4;
     if (sunUp) {
       const sp = (h - 6.2) / (20.2 - 6.2);
       let sx = lerp(10, 90, sp);
       let sy = 78 - Math.sin(Math.PI * Math.min(1, Math.max(0, sp))) * 64;
-      /* eclipse convergence: the two bodies meet at (56vw, 34vh) */
-      const ec = 1 - Math.min(1, Math.abs(h - 19.63) / 0.55);
-      if (ec > 0) { sx = lerp(sx, 56, ec); sy = lerp(sy, 34, ec); }
+      const ec = ease(1 - Math.min(1, Math.abs(h - 19.63) / 0.55));
+      if (ec > 0) { sx = lerp(sx, 50, ec); sy = lerp(sy, 38, ec); }
       sol.style.left = sx + 'vw'; sol.style.top = sy + 'vh';
       sol.style.opacity = h > 19.9 ? Math.max(0, 1 - (h - 19.9) / 0.5) : 1;
     } else sol.style.opacity = 0;
 
-    /* ---------- the moon: rises 18.6, climbs to the nym hour ---------- */
+    /* the moon */
     const moonUp = h >= 18.6;
     if (moonUp) {
       const mp = Math.min(1, (h - 18.6) / (25.5 - 18.6));
       let mx = lerp(96, 50, Math.pow(mp, 0.8));
       let my = lerp(80, 18, Math.sin(mp * Math.PI / 2));
-      const ec = 1 - Math.min(1, Math.abs(h - 19.63) / 0.55);
-      if (ec > 0) { mx = lerp(mx, 56, ec); my = lerp(my, 34, ec); }
+      const ec = ease(1 - Math.min(1, Math.abs(h - 19.63) / 0.55));
+      if (ec > 0) { mx = lerp(mx, 50, ec); my = lerp(my, 38, ec); }
       luna.style.left = mx + 'vw'; luna.style.top = my + 'vh';
       luna.style.opacity = Math.min(1, (h - 18.6) / 0.6);
     } else luna.style.opacity = 0;
     root.classList.toggle('eclipse', Math.abs(h - 19.63) < 0.5);
 
-    /* moth: awake after 21h, orbits near the moon */
+    /* moth: awake after 21h */
     if (!reduced && h > 21) {
       const mt = performance.now() / 1000;
       const lx = parseFloat(luna.style.left) || 50, ly = parseFloat(luna.style.top) || 20;
@@ -136,63 +132,84 @@
     } else moth.style.opacity = 0;
   }
   addEventListener('scroll', () => {
-    if (document.hidden) { update(); return; }   // rAF sleeps in hidden tabs
+    if (document.hidden) { update(); return; }
     if (!ticking) { ticking = true; requestAnimationFrame(update); }
   }, { passive: true });
   addEventListener('visibilitychange', update);
-  addEventListener('resize', update);
-
-  /* keep the moth breathing even without scroll */
   if (!reduced) setInterval(() => { if (parseFloat(moth.style.opacity) > 0) update(); }, 120);
 
-  /* ---------- la otra mitad: hold the seal (or M) ---------- */
+  /* ---------- language: one language at a time ---------- */
   const sello = document.getElementById('sello');
-  let holdTimer = null, held = false;
-  sello.addEventListener('pointerdown', e => {
-    holdTimer = setTimeout(() => { held = true; root.classList.add('lens'); }, 250);
-    sello.setPointerCapture(e.pointerId);
+  const selloLang = document.getElementById('sello-lang');
+  function setLang(es) {
+    root.classList.toggle('es', es);
+    root.lang = es ? 'es' : 'en';
+    selloLang.textContent = es ? 'EN' : 'ES';   // the seal offers the other language
+    try { localStorage.setItem('nym-lang', es ? 'es' : 'en'); } catch (_) {}
+    buildMap(); update();
+  }
+  sello.addEventListener('click', () => setLang(!esOn()));
+  try { if (localStorage.getItem('nym-lang') === 'es') setLang(true); } catch (_) {}
+
+  /* ---------- call sheet: hover a row, see the work ---------- */
+  const stillLayer = document.getElementById('still-layer');
+  document.querySelectorAll('.callsheet a[data-still], .sheet tr[data-still]').forEach(row => {
+    const show = () => {
+      stillLayer.style.backgroundImage = `url("${row.dataset.still}")`;
+      stillLayer.classList.add('show');
+    };
+    const hide = () => stillLayer.classList.remove('show');
+    row.addEventListener('mouseenter', show);
+    row.addEventListener('mouseleave', hide);
+    row.addEventListener('focus', show);
+    row.addEventListener('blur', hide);
   });
-  const release = () => {
-    clearTimeout(holdTimer);
-    if (held) { held = false; root.classList.remove('lens'); }
-    else root.classList.toggle('lens');   // quick tap toggles, hold is momentary
-  };
-  sello.addEventListener('pointerup', release);
-  sello.addEventListener('pointercancel', () => {
-    clearTimeout(holdTimer);
-    if (held) { held = false; root.classList.remove('lens'); }
+
+  /* ---------- the screening: tonight's program ---------- */
+  const monScreen = document.querySelector('.mon-screen');
+  const hintBtn = document.getElementById('play-hint');
+  const offBtn = document.getElementById('off-reel');
+  function clearScreen() {
+    monScreen.querySelectorAll('iframe, video').forEach(el => el.remove());
+  }
+  function play(src) {
+    clearScreen();
+    let el;
+    if (src.startsWith('yt:')) {
+      el = document.createElement('iframe');
+      el.src = `https://www.youtube.com/embed/${src.slice(3)}?autoplay=1&rel=0&modestbranding=1`;
+      el.allow = 'autoplay; encrypted-media; picture-in-picture';
+      el.title = 'Reel';
+    } else {
+      el = document.createElement('video');
+      el.src = src;
+      el.controls = true;
+      el.autoplay = true;
+      el.playsInline = true;
+    }
+    monScreen.appendChild(el);
+    hintBtn.hidden = true; offBtn.hidden = false;
+  }
+  document.querySelectorAll('.programa button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.programa button').forEach(x => x.classList.toggle('on', x === btn));
+      play(btn.dataset.src);
+    });
   });
-  addEventListener('keydown', e => { if (e.key === 'm') root.classList.toggle('lens'); });
+  offBtn.addEventListener('click', () => {
+    clearScreen();
+    hintBtn.hidden = false; offBtn.hidden = true;
+    document.querySelectorAll('.programa button').forEach(x => x.classList.remove('on'));
+  });
 
   /* ---------- reveals ---------- */
   if (!reduced) {
     const io = new IntersectionObserver(es => es.forEach(en => {
       if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
     }), { threshold: 0.18 });
-    document.querySelectorAll('.p, .recibo, .monitor').forEach(el => io.observe(el));
+    document.querySelectorAll('.p, .recibo, .monitor, .cutouts').forEach(el => io.observe(el));
   } else {
-    document.querySelectorAll('.p, .recibo, .monitor').forEach(el => el.classList.add('in'));
-  }
-
-  /* ---------- la función: the reel plays in the dark ---------- */
-  const monScreen = document.querySelector('.mon-screen');
-  const playBtn = document.getElementById('play-reel');
-  const offBtn = document.getElementById('off-reel');
-  if (playBtn) {
-    playBtn.addEventListener('click', () => {
-      if (monScreen.querySelector('iframe')) return;
-      const f = document.createElement('iframe');
-      f.src = 'https://www.youtube.com/embed/saYu8WDDYMY?autoplay=1&rel=0&modestbranding=1';
-      f.allow = 'autoplay; encrypted-media; picture-in-picture';
-      f.title = 'Reel 2026';
-      monScreen.appendChild(f);
-      playBtn.hidden = true; offBtn.hidden = false;
-    });
-    offBtn.addEventListener('click', () => {
-      const f = monScreen.querySelector('iframe');
-      if (f) f.remove();
-      playBtn.hidden = false; offBtn.hidden = true;
-    });
+    document.querySelectorAll('.p, .recibo, .monitor, .cutouts').forEach(el => el.classList.add('in'));
   }
 
   update();
