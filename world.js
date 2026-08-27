@@ -31,6 +31,9 @@
     lean.y = (e.clientY / vh - 0.5) * 7;
   }, { passive: true });
 
+  const lObj = document.getElementById('l-obj');
+  const lAir = document.getElementById('l-air');
+  const lPaper = document.getElementById('l-paper');
   function render() {
     cam.x += (tgt.x - cam.x) * LERP;
     cam.y += (tgt.y - cam.y) * LERP;
@@ -39,6 +42,13 @@
     const tx = vw / 2 - (cam.x + lx) * cam.z;
     const ty = vh / 2 - (cam.y + ly) * cam.z;
     world.style.transform = `translate3d(${tx}px, ${ty}px, 0) scale(${cam.z})`;
+    /* depth: papers, objects, and air ride at different rates — the room has thickness */
+    if (!reduced) {
+      const ox = cam.x - WORLD.w / 2, oy = cam.y - WORLD.h / 2;
+      lPaper.style.transform = `translate3d(${-ox * 0.006 - lx * 0.3}px, ${-oy * 0.006 - ly * 0.3}px, 0)`;
+      lObj.style.transform   = `translate3d(${-ox * 0.014 - lx * 0.8}px, ${-oy * 0.014 - ly * 0.8}px, 0)`;
+      lAir.style.transform   = `translate3d(${-ox * 0.028 - lx * 1.6}px, ${-oy * 0.028 - ly * 1.6}px, 0)`;
+    }
   }
 
   /* ---------- the ride (scroll = composed dolly path) ---------- */
@@ -62,7 +72,8 @@
   addEventListener('wheel', e => {
     e.preventDefault();
     t = Math.min(PATH.length - 1, Math.max(0, t + e.deltaY * 0.0016));
-    Object.assign(tgt, pathAt(t));
+    const p = pathAt(t);
+    tgt.x = p.x; tgt.y = p.y; tgt.z = p.z * zk();
     clampTarget();
   }, { passive: false });
 
@@ -82,7 +93,17 @@
   });
   addEventListener('pointerup', () => { drag = null; frame.classList.remove('dragging'); });
 
-  function goTo(x, y, z) { tgt.x = x; tgt.y = y; if (z) tgt.z = z; clampTarget(); }
+  /* small screens sit closer to the table */
+  const zk = () => (vw < 700 ? 0.56 : 1);
+  function goTo(x, y, z) { tgt.x = x; tgt.y = y; if (z) tgt.z = z * zk(); clampTarget(); }
+
+  /* double-click: push in on whatever is under the cursor; again to pull back */
+  frame.addEventListener('dblclick', e => {
+    if (e.target.closest('a, button')) return;
+    const wx = cam.x + (e.clientX - vw / 2) / cam.z;
+    const wy = cam.y + (e.clientY - vh / 2) / cam.z;
+    if (cam.z < 1.35 * zk()) goTo(wx, wy, 1.55); else goTo(wx, wy, 1.0);
+  });
 
   /* ---------- light is the state system ---------- */
   let hourOverride = null;          // null = the visitor's real clock
@@ -192,18 +213,58 @@
     ch.addEventListener('click', () => deal(ch.dataset.aud)));
 
   /* ---------- cards open their fans (a push-in, not a page) ---------- */
+  function openDiscipline(name) {
+    document.querySelectorAll('.card').forEach(c => c.classList.toggle('active', c.dataset.card === name));
+    document.querySelectorAll('.fan').forEach(f => f.classList.toggle('open', f.id === 'fan-' + name));
+    const f = FANS[name];
+    goTo(f.x, f.y + 30, 1.18);
+  }
   document.querySelectorAll('.card').forEach(card => {
     card.setAttribute('tabindex', '0');
-    const open = () => {
-      const name = card.dataset.card;
-      document.querySelectorAll('.card').forEach(c => c.classList.toggle('active', c === card));
-      document.querySelectorAll('.fan').forEach(f =>
-        f.classList.toggle('open', f.id === 'fan-' + name));
-      const f = FANS[name];
-      goTo(f.x, f.y + 30, 1.18);
-    };
-    card.addEventListener('click', open);
-    card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+    card.addEventListener('click', () => openDiscipline(card.dataset.card));
+    card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDiscipline(card.dataset.card); } });
+  });
+
+  /* the index sheet navigates — each row walks to its discipline's fan */
+  const DISC = { 'FICCIÓN': 'ficcion', 'DOCUMENTAL': 'documental', 'ANUNCIO': 'anuncio',
+                 'TRANSMISIÓN': 'transmision', 'CORTE': 'corte', 'IMAGEN': 'imagen', 'MÁQUINA': 'maquina' };
+  document.querySelectorAll('#tabla tr').forEach(tr => {
+    const tag = tr.cells[2] ? tr.cells[2].textContent : '';
+    const name = Object.keys(DISC).find(k => tag.includes(k));
+    if (name) tr.addEventListener('click', () => openDiscipline(DISC[name]));
+  });
+
+  /* expedientes: click to lean in and read, click again to sit back */
+  let leaned = null;
+  document.querySelectorAll('.exp').forEach(exp => {
+    exp.addEventListener('click', e => {
+      if (e.target.closest('a')) return;
+      const x = parseFloat(exp.style.getPropertyValue('--x'));
+      const y = parseFloat(exp.style.getPropertyValue('--y'));
+      if (leaned === exp) { leaned = null; openDiscipline(exp.dataset.card); }
+      else { leaned = exp; goTo(x, y, 1.6); }
+    });
+  });
+
+  /* ---------- el monitor: the reel plays in the room, never leaves it ---------- */
+  const monScreen = document.querySelector('.mon-screen');
+  const playBtn = document.getElementById('play-reel');
+  const offBtn = document.getElementById('off-reel');
+  playBtn.addEventListener('click', () => {
+    if (monScreen.querySelector('iframe')) return;
+    const f = document.createElement('iframe');
+    f.src = 'https://www.youtube.com/embed/saYu8WDDYMY?autoplay=1&rel=0&modestbranding=1';
+    f.allow = 'autoplay; encrypted-media; picture-in-picture';
+    f.title = 'Reel 2026';
+    monScreen.appendChild(f);
+    playBtn.hidden = true; offBtn.hidden = false;
+    goTo(640, 1160, 1.5);
+  });
+  offBtn.addEventListener('click', () => {
+    const f = monScreen.querySelector('iframe');
+    if (f) f.remove();
+    playBtn.hidden = false; offBtn.hidden = true;
+    goTo(640, 1180, 1.0);
   });
 
   /* ---------- drawer & envelope ---------- */
@@ -241,7 +302,8 @@
 
   /* ---------- boot: the table draws itself, then the ink floods in ---------- */
   addEventListener('load', () => {
-    setTimeout(() => root.classList.remove('boot'), reduced ? 0 : 950);
+    setTimeout(() => root.classList.remove('boot'), reduced ? 0 : 1400);
+    tgt.z = 1.05 * zk(); clampTarget();
     // returning visitor with a dealt hand keeps their table as they left it
     try {
       const aud = localStorage.getItem('mesa-aud');

@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Noche y Media — La Mesa</title>
 <meta name="description" content="El portafolio de Sofía González Irigoyen. Una mesa de producción que existe en sus dos estados a la vez.">
+<meta name="theme-color" content="#241812">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Ccircle cx='60' cy='60' r='44' fill='%232244AA'/%3E%3Ccircle cx='69' cy='54' r='30' fill='%23FAF5DD'/%3E%3Ccircle cx='78' cy='48' r='24' fill='%232244AA'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Space+Mono:wght@400;700&family=Caveat:wght@500;600&display=swap">
 <link rel="stylesheet" href="style.css">
@@ -16,9 +18,14 @@
   <!-- ============ THE WORLD (one table, one master shot) ============ -->
   <div id="world">
 
-    <!-- surface -->
+    <!-- surface: a table with edges, standing on a floor -->
     <div class="layer" id="l-table">
-      <div id="wood"></div>
+      <div id="table">
+        <div class="wear ring" style="left:1720px;top:1560px"></div>
+        <div class="wear ring r2" style="left:2960px;top:640px"></div>
+        <div class="wear scratch" style="left:1180px;top:840px"></div>
+        <div class="wear smudge" style="left:3240px;top:1700px"></div>
+      </div>
       <div id="lamp-pool" class="light"></div>
       <div id="window-light" class="light"></div>
     </div>
@@ -243,7 +250,8 @@
       <div class="o" id="monitor" style="--x:600;--y:1150;--r:-1">
         <div class="mon-screen">
           <div class="bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-          <a class="mon-play" href="https://www.youtube.com/watch?v=saYu8WDDYMY" target="_blank" rel="noopener">▶ REEL 2026</a>
+          <button class="mon-play" id="play-reel">▶ REEL 2026</button>
+          <button class="mon-off" id="off-reel" hidden>APAGAR</button>
         </div>
         <div class="mon-base"></div>
         <span class="olabel">EL MONITOR</span>
