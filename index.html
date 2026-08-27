@@ -1,316 +1,251 @@
 <!DOCTYPE html>
-<html lang="es" class="boot">
+<html lang="es">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Noche y Media — La Mesa</title>
-<meta name="description" content="El portafolio de Sofía González Irigoyen. Una mesa de producción que existe en sus dos estados a la vez.">
+<title>Noche y Media — Sofía González Irigoyen</title>
+<meta name="description" content="Un día de producción que termina a la 1:30 de la mañana. The portfolio of Sofía González Irigoyen — creative producer, editor, filmmaker.">
+<meta name="theme-color" content="#10142A">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Ccircle cx='60' cy='60' r='44' fill='%232244AA'/%3E%3Ccircle cx='69' cy='54' r='30' fill='%23FAF5DD'/%3E%3Ccircle cx='78' cy='48' r='24' fill='%232244AA'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Space+Mono:wght@400;700&family=Caveat:wght@500;600&display=swap">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- ============ THE FRAME (viewport into the room) ============ -->
-<div id="frame">
-  <!-- ============ THE WORLD (one table, one master shot) ============ -->
-  <div id="world">
-
-    <!-- surface -->
-    <div class="layer" id="l-table">
-      <div id="wood"></div>
-      <div id="lamp-pool" class="light"></div>
-      <div id="window-light" class="light"></div>
-    </div>
-
-    <!-- papers -->
-    <div class="layer" id="l-paper">
-
-      <!-- llegada: the question -->
-      <div class="p" id="pregunta" style="--x:2100;--y:1520;--r:-1.2;--w:560">
-        <h1>¿Quién eres?</h1>
-        <p class="es-sub">who's sitting down?</p>
-        <div class="answers">
-          <button class="chip" data-aud="recruiter">Producción / Recruiter</button>
-          <button class="chip" data-aud="agencia">Agencia</button>
-          <button class="chip" data-aud="director">Director · Colaborador</button>
-          <button class="chip" data-aud="chisme">Solo estoy chismeando</button>
-        </div>
-      </div>
-
-      <!-- la tabla completa (index sheet) -->
-      <div class="p sheet" id="tabla" style="--x:2100;--y:330;--r:.6;--w:640">
-        <div class="sheet-head"><span>LA TABLA COMPLETA</span><span class="en-txt">every project</span><span class="es">todos los proyectos</span></div>
-        <table>
-          <tr><td>2026</td><td>Si Solamente</td><td>FICCIÓN · PRODUCER</td><td>Best Picture, Redstone</td></tr>
-          <tr><td>2026</td><td>Pajuyuk</td><td>DOCUMENTAL · POST</td><td>US premiere, True/False</td></tr>
-          <tr><td>2026</td><td>US Bank × NFL — Real MVP</td><td>ANUNCIO · EDITOR</td><td>Supergood</td></tr>
-          <tr><td>2026</td><td>Studio S</td><td>MÁQUINA · BUILDER</td><td>internal tool, 2 weeks</td></tr>
-          <tr><td>2026</td><td>Si Solamente — poster</td><td>IMAGEN · DESIGN</td><td></td></tr>
-          <tr><td>2026</td><td>2026 Filmmaking Reel</td><td>CORTE</td><td></td></tr>
-          <tr><td>2026</td><td>AdLab — Capital One · MassDOT · AAF</td><td>ANUNCIO · PRODUCER</td><td>6 deliverables</td></tr>
-          <tr><td>25-26</td><td>Bay State</td><td>TRANSMISIÓN · PRODUCER</td><td>longest-running student soap, USA</td></tr>
-          <tr><td>2025</td><td>Telemundo 52 — Acceso Total</td><td>TRANSMISIÓN · INTERN</td><td>NBCU, Los Ángeles</td></tr>
-          <tr><td>2025</td><td>Only Humans Can</td><td>ANUNCIO · SPEC</td><td>SAG-AFTRA mock</td></tr>
-          <tr><td>24-25</td><td>The Wire</td><td>TRANSMISIÓN · DIRECTOR</td><td>BUTV10</td></tr>
-          <tr><td>24-25</td><td>Live with TY</td><td>CORTE · CHIEF EDITOR</td><td>10 weekly deliverables</td></tr>
-          <tr><td>2024</td><td>La Red / TVI — Santiago</td><td>TRANSMISIÓN · PROD ASST</td><td>live TV, Chile</td></tr>
-          <tr><td>2024</td><td>Birds Eye View</td><td>FICCIÓN · DIRECTOR</td><td>showcase pick</td></tr>
-          <tr><td>2024</td><td>Lucky Streak</td><td>DOCUMENTAL</td><td></td></tr>
-          <tr><td>2023</td><td>Don't Forget to Swing Wilbur</td><td>FICCIÓN</td><td></td></tr>
-          <tr><td>17-22</td><td>sofirichof.art</td><td>IMAGEN · PAINTER</td><td>the first body of work</td></tr>
-        </table>
-      </div>
-
-      <!-- nota de remisión (services) -->
-      <div class="p nota" id="nota" style="--x:1250;--y:2320;--r:1.4;--w:380">
-        <div class="nota-head">NOTA DE REMISIÓN <span>folio 001</span></div>
-        <div class="nota-row"><span>Line producer</span><span>✓</span></div>
-        <div class="nota-row"><span>Creative producer</span><span>✓</span></div>
-        <div class="nota-row"><span>Editor · post</span><span>✓</span></div>
-        <div class="nota-row"><span>AI pipeline · tools</span><span>✓</span></div>
-        <div class="nota-row"><span>EN ↔ ES production</span><span>✓</span></div>
-        <div class="nota-foot">CDMX · MIA · BOS · NYC</div>
-      </div>
-
-      <!-- hint card (diegetic help) -->
-      <div class="p hint" id="hint" style="--x:2510;--y:1830;--r:3;--w:230">
-        <p class="en-txt">drag the table · scroll for the tour · hold the seal for <em>la otra mitad</em></p>
-        <p class="es">arrastra la mesa · scroll para el recorrido · mantén el sello para la otra mitad</p>
-      </div>
-
-      <!-- expediente fans (papers exist from frame one) -->
-      <div class="fan" id="fan-ficcion" style="--fx:2850;--fy:1780">
-        <div class="p exp" data-card="ficcion" style="--x:2850;--y:1780;--r:-4;--w:330">
-          <div class="exp-head"><b>SI SOLAMENTE</b><span>2026 · FICCIÓN</span></div>
-          <div class="still"></div>
-          <p class="en-txt">Producer. Kerlin Campos' thesis film about an immigrant family under threat — majority-immigrant crew. Swept Redstone: Best Picture, Editing, Sound, Screenplay, Production Design, Actor. Cilect submission.</p>
-          <p class="es">Productora. La película de tesis de Kerlin Campos sobre una familia inmigrante bajo amenaza — equipo mayoritariamente inmigrante. Arrasó en Redstone.</p>
-          <p class="note">este rodaje casi se muere dos veces. lo salvamos con tacos.</p>
-          <div class="laurel">★ BEST PICTURE · REDSTONE 2026</div>
-        </div>
-        <div class="p exp" data-card="ficcion" style="--x:2985;--y:1905;--r:5;--w:290">
-          <div class="exp-head"><b>BIRDS EYE VIEW</b><span>2024 · SHORT</span></div>
-          <p class="en-txt">Director. A frustrated photographer changes his perspective. End-of-semester showcase pick.</p>
-          <p class="es">Directora. Un fotógrafo frustrado cambia de perspectiva.</p>
-        </div>
-        <div class="p exp" data-card="ficcion" style="--x:2720;--y:1935;--r:-8;--w:280">
-          <div class="exp-head"><b>SWING WILBUR</b><span>2023 · SHORT</span></div>
-          <p class="en-txt">Writer/director. OCD as an everyday horror film — the daily dread, exaggerated until visible.</p>
-          <p class="es">El TOC como película de terror cotidiana.</p>
-        </div>
-      </div>
-
-      <div class="fan" id="fan-documental" style="--fx:3380;--fy:2020">
-        <div class="p exp" data-card="documental" style="--x:3380;--y:2020;--r:2.5;--w:330">
-          <div class="exp-head"><b>PAJUYUK</b><span>2026 · DOCUMENTAL</span></div>
-          <div class="still"></div>
-          <p class="en-txt">Post team + US-premiere representative at True/False. Napuruna midwives of the Ecuadorian Amazon renew their ancestral wisdom. Also screened at Festival de Málaga.</p>
-          <p class="es">Equipo de post y representante del estreno en EE.UU. Las parteras Napuruna del Amazonas ecuatoriano.</p>
-          <p class="note">fui la voz de la peli en Missouri. spring break inolvidable.</p>
-        </div>
-        <div class="p exp" data-card="documental" style="--x:3510;--y:2140;--r:-5;--w:270">
-          <div class="exp-head"><b>LUCKY STREAK</b><span>2024 · DOC</span></div>
-          <p class="en-txt">Narrative documentary.</p>
-          <p class="es">Documental narrativo.</p>
-        </div>
-      </div>
-
-      <div class="fan" id="fan-transmision" style="--fx:760;--fy:1980">
-        <div class="p exp" data-card="transmision" style="--x:760;--y:1980;--r:-2;--w:320">
-          <div class="exp-head"><b>BAY STATE</b><span>25–26 · TRANSMISIÓN</span></div>
-          <div class="still"></div>
-          <p class="en-txt">Producer of the longest-running continuously produced student soap opera in the United States. BUTV10.</p>
-          <p class="es">Productora de la telenovela estudiantil más antigua de Estados Unidos.</p>
-          <p class="note">una telenovela. en serio. mi abuela estaría orgullosa.</p>
-        </div>
-        <div class="p exp" data-card="transmision" style="--x:900;--y:2110;--r:6;--w:280">
-          <div class="exp-head"><b>ACCESO TOTAL</b><span>2025 · TELEMUNDO 52</span></div>
-          <p class="en-txt">Marketing intern, NBCU Los Angeles. Booking, on-location segments, red carpets, VOs and SOTs.</p>
-          <p class="es">Práctica en LA: booking, segmentos, alfombras rojas.</p>
-        </div>
-        <div class="p exp" data-card="transmision" style="--x:620;--y:2120;--r:-7;--w:270">
-          <div class="exp-head"><b>LA RED · TVI</b><span>22 / 24 · CHILE</span></div>
-          <p class="en-txt">Live TV in Santiago — Sabores, Zona de Estrellas, ¡Hola Chile! On-set producer for a full episode.</p>
-          <p class="es">TV en vivo en Santiago. Productora en set de un episodio completo.</p>
-        </div>
-        <div class="p exp" data-card="transmision" style="--x:780;--y:2230;--r:3;--w:260">
-          <div class="exp-head"><b>GMBU · THE WIRE</b><span>23–25 · BUTV10</span></div>
-          <p class="en-txt">Interview correspondent and writer; director for The Wire.</p>
-          <p class="es">Corresponsal, guionista y directora.</p>
-        </div>
-      </div>
-
-      <div class="fan" id="fan-anuncio" style="--fx:1380;--fy:560">
-        <div class="p exp" data-card="anuncio" style="--x:1380;--y:560;--r:1.5;--w:330">
-          <div class="exp-head"><b>US BANK × NFL</b><span>2026 · SUPERGOOD</span></div>
-          <div class="still"></div>
-          <p class="en-txt">Editor on the NFL sponsorship campaign — 9:16 masters for Meta, Pinterest, Snapchat; Real MVP athlete episodes, string-out through client review.</p>
-          <p class="es">Editora de la campaña NFL — masters 9:16 y episodios Real MVP.</p>
-        </div>
-        <div class="p exp" data-card="anuncio" style="--x:1520;--y:690;--r:-5;--w:290">
-          <div class="exp-head"><b>ADLAB</b><span>2026 · PRODUCER</span></div>
-          <p class="en-txt">Capital One, MassDOT, Affordable Art Fair — six deliverables, client point of contact. "Above and Beyond" AdLabbie.</p>
-          <p class="es">Seis entregas, contacto directo con clientes.</p>
-        </div>
-        <div class="p exp" data-card="anuncio" style="--x:1250;--y:700;--r:7;--w:270">
-          <div class="exp-head"><b>ONLY HUMANS CAN</b><span>2025 · SPEC</span></div>
-          <p class="en-txt">SAG-AFTRA anti-AI ad mockup. Yes, the AI filmmaker made the anti-AI ad. Both are honest.</p>
-          <p class="es">El anuncio anti-IA hecho por la cineasta de IA. Las dos cosas son honestas.</p>
-          <p class="note">la ironía no se me escapa.</p>
-        </div>
-      </div>
-
-      <div class="fan" id="fan-corte" style="--fx:520;--fy:600">
-        <div class="p exp" data-card="corte" style="--x:520;--y:600;--r:-3;--w:300">
-          <div class="exp-head"><b>2026 REEL</b><span>CORTE</span></div>
-          <p class="en-txt">The cut of everything — on the monitor. Press play over there.</p>
-          <p class="es">El corte de todo — en el monitor.</p>
-        </div>
-        <div class="p exp" data-card="corte" style="--x:640;--y:720;--r:4;--w:280">
-          <div class="exp-head"><b>LIVE WITH TY</b><span>24–25 · CHIEF EDITOR</span></div>
-          <p class="en-txt">Led the edit team: ten weekly deliverables, all show graphics and the intro animation.</p>
-          <p class="es">Lideré el equipo de edición: diez entregas semanales.</p>
-        </div>
-      </div>
-
-      <div class="fan" id="fan-imagen" style="--fx:3350;--fy:520">
-        <div class="p exp" data-card="imagen" style="--x:3350;--y:520;--r:2;--w:300">
-          <div class="exp-head"><b>SOFIRICHOF.ART</b><span>2017–22 · PAINTER</span></div>
-          <div class="still pink"></div>
-          <p class="en-txt">The first body of work: gouache, ink, line portraits. Five years of it, before film took over.</p>
-          <p class="es">La primera obra: gouache, tinta, retratos a línea. Cinco años, antes del cine.</p>
-          <p class="note">la pintora sigue aquí. ella hace los posters.</p>
-        </div>
-        <div class="p exp" data-card="imagen" style="--x:3480;--y:650;--r:-6;--w:280">
-          <div class="exp-head"><b>SI SOLAMENTE — POSTER</b><span>2026 · DESIGN</span></div>
-          <p class="en-txt">Poster design for the film. Photography by Zuzanna Ziolkowska.</p>
-          <p class="es">Diseño del poster de la película.</p>
-        </div>
-      </div>
-
-      <div class="fan" id="fan-maquina" style="--fx:2380;--fy:520">
-        <div class="p exp" data-card="maquina" style="--x:2380;--y:520;--r:-1.5;--w:320">
-          <div class="exp-head"><b>STUDIO S</b><span>2026 · SUPERGOOD</span></div>
-          <p class="en-txt">Internal desktop tool built in two weeks: script-to-shot-list breakdown, guided prompt builder, generation tracker with per-shot costs. Demoed to agency leadership.</p>
-          <p class="es">Herramienta interna construida en dos semanas. Presentada a la dirección de la agencia.</p>
-          <p class="note">la productora que programa. la mesa también la construí yo.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- objects -->
-    <div class="layer" id="l-obj">
-
-      <!-- the deck + dealt cards -->
-      <div class="o card" id="c-transmision" data-card="transmision" style="--x:1980;--y:1180;--r:0">
-        <span class="cnum">01</span>
-        <svg viewBox="0 0 60 60"><rect x="10" y="20" width="40" height="28" rx="2"/><line x1="22" y1="20" x2="14" y2="6"/><line x1="38" y1="20" x2="46" y2="6"/><circle cx="30" cy="34" r="7"/></svg>
-        <span class="cname">LA TRANSMISIÓN</span><span class="cgloss en-txt">broadcast</span><span class="cgloss es">televisión</span>
-      </div>
-      <div class="o card" id="c-anuncio" data-card="anuncio" style="--x:1984;--y:1184;--r:1">
-        <span class="cnum">02</span>
-        <svg viewBox="0 0 60 60"><path d="M8 26 L36 14 V46 L8 34 Z"/><path d="M36 22 c10 2 10 14 0 16"/><line x1="14" y1="34" x2="14" y2="48"/></svg>
-        <span class="cname">EL ANUNCIO</span><span class="cgloss en-txt">advertising</span><span class="cgloss es">publicidad</span>
-      </div>
-      <div class="o card" id="c-ficcion" data-card="ficcion" style="--x:1988;--y:1188;--r:2">
-        <span class="cnum">03</span>
-        <svg viewBox="0 0 60 60"><rect x="10" y="26" width="40" height="22" rx="2"/><path d="M10 26 L50 16 L48 8 L8 18 Z"/><line x1="18" y1="16.5" x2="22" y2="24"/><line x1="30" y1="13.5" x2="34" y2="21"/><line x1="42" y1="10.5" x2="46" y2="18"/></svg>
-        <span class="cname">LA FICCIÓN</span><span class="cgloss en-txt">narrative</span><span class="cgloss es">narrativa</span>
-      </div>
-      <div class="o card" id="c-documental" data-card="documental" style="--x:1992;--y:1192;--r:3">
-        <span class="cnum">04</span>
-        <svg viewBox="0 0 60 60"><path d="M6 30 C18 14 42 14 54 30 C42 46 18 46 6 30 Z"/><circle cx="30" cy="30" r="8"/><circle cx="30" cy="30" r="2.4" fill="currentColor"/></svg>
-        <span class="cname">EL DOCUMENTAL</span><span class="cgloss en-txt">documentary</span><span class="cgloss es">documental</span>
-      </div>
-      <div class="o card" id="c-corte" data-card="corte" style="--x:1996;--y:1196;--r:4">
-        <span class="cnum">05</span>
-        <svg viewBox="0 0 60 60"><circle cx="18" cy="42" r="7"/><circle cx="18" cy="18" r="7"/><line x1="24" y1="23" x2="48" y2="44"/><line x1="24" y1="37" x2="48" y2="16"/></svg>
-        <span class="cname">EL CORTE</span><span class="cgloss en-txt">editing</span><span class="cgloss es">edición</span>
-      </div>
-      <div class="o card" id="c-imagen" data-card="imagen" style="--x:2000;--y:1200;--r:5">
-        <span class="cnum">06</span>
-        <svg viewBox="0 0 60 60"><path d="M14 46 C10 36 18 12 30 10 C26 22 34 26 44 22 C50 34 38 48 26 48"/><circle cx="24" cy="40" r="2.4" fill="currentColor"/></svg>
-        <span class="cname">LA IMAGEN</span><span class="cgloss en-txt">design & paint</span><span class="cgloss es">diseño y pintura</span>
-      </div>
-      <div class="o card" id="c-maquina" data-card="maquina" style="--x:2004;--y:1204;--r:6">
-        <span class="cnum">07</span>
-        <svg viewBox="0 0 60 60"><rect x="12" y="12" width="36" height="36" rx="4"/><circle cx="30" cy="30" r="8"/><line x1="30" y1="4" x2="30" y2="12"/><line x1="30" y1="48" x2="30" y2="56"/><line x1="4" y1="30" x2="12" y2="30"/><line x1="48" y1="30" x2="56" y2="30"/></svg>
-        <span class="cname">LA MÁQUINA</span><span class="cgloss en-txt">tools & AI craft</span><span class="cgloss es">herramientas</span>
-      </div>
-
-      <!-- monitor -->
-      <div class="o" id="monitor" style="--x:600;--y:1150;--r:-1">
-        <div class="mon-screen">
-          <div class="bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-          <a class="mon-play" href="https://www.youtube.com/watch?v=saYu8WDDYMY" target="_blank" rel="noopener">▶ REEL 2026</a>
-        </div>
-        <div class="mon-base"></div>
-        <span class="olabel">EL MONITOR</span>
-      </div>
-
-      <!-- drawer -->
-      <div class="o" id="cajon" style="--x:3560;--y:1050;--r:.5" tabindex="0" role="button" aria-label="El cajón — the story drawer">
-        <div class="cajon-lid"><span>EL CAJÓN</span><i></i></div>
-        <div class="cajon-inside">
-          <div class="keep postcard"><b>DURANGO</b><span class="en-txt">where dad is from</span><span class="es">de donde es papá</span></div>
-          <div class="keep postcard mty"><b>MONTERREY</b><span class="en-txt">where mom is from</span><span class="es">de donde es mamá</span></div>
-          <div class="keep sarape" title="el sarape de la graduación"></div>
-          <div class="keep clipping">
-            <b>BU TODAY · 2026</b>
-            <p class="en-txt">"It's a scary time right now to be someone like me." — the Best Picture speech. Half the year in Miami, half in México, until sixteen. Citizen since 2025. The whole story, kept on paper.</p>
-            <p class="es">"Es un momento aterrador para ser alguien como yo." — el discurso de Best Picture. Medio año en Miami, medio en México, hasta los dieciséis.</p>
-          </div>
-          <div class="keep paint"></div><div class="keep paint p2"></div>
-        </div>
-      </div>
-
-      <!-- envelope -->
-      <div class="o" id="sobre" style="--x:2900;--y:2260;--r:-2" tabindex="0" role="button" aria-label="El sobre — contact">
-        <div class="flap"></div>
-        <div class="sobre-face">
-          <span class="addr">Sofía González Irigoyen<br>Noche y Media Productions</span>
-          <span class="sello-postal">NyM</span>
-        </div>
-        <div class="sobre-links">
-          <a href="mailto:sofiagi@bu.edu">sofiagi@bu.edu</a>
-          <a href="https://www.linkedin.com/in/sofia-gonzalez-irigoyen-/" target="_blank" rel="noopener">LinkedIn</a>
-          <a href="https://www.instagram.com/sofirichof/" target="_blank" rel="noopener">@sofirichof</a>
-          <a href="https://www.instagram.com/sofirichof.art/" target="_blank" rel="noopener">@sofirichof.art</a>
-        </div>
-        <span class="olabel">EL SOBRE</span>
-      </div>
-
-      <!-- lamp + cafecito -->
-      <div class="o" id="lamp" style="--x:3050;--y:900;--r:0"><div class="lamp-shade"></div><div class="lamp-arm"></div></div>
-      <div class="o" id="cafe" style="--x:1650;--y:1650;--r:0"><div class="cup"></div><div class="plato"></div></div>
-    </div>
-
-    <!-- air -->
-    <div class="layer" id="l-air">
-      <div id="steam"><i></i><i></i><i></i></div>
-      <div id="polilla" aria-hidden="true"></div>
-    </div>
-  </div>
-
-  <!-- grade & vignette (light model output) -->
-  <div id="grade"></div>
-  <div id="vignette"></div>
-  <svg id="grain" aria-hidden="true"><filter id="gn"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2"/></filter><rect width="100%" height="100%" filter="url(#gn)"/></svg>
+<!-- ============ THE SKY (the world is the hour) ============ -->
+<div id="cielo" aria-hidden="true"></div>
+<div id="sol" aria-hidden="true"></div>
+<div id="luna" aria-hidden="true">
+  <svg viewBox="0 0 120 120"><g fill="currentColor" id="luna-rays">
+    <polygon points="60,0 66,24 54,24"/><polygon points="60,0 66,24 54,24" transform="rotate(30 60 60)"/>
+    <polygon points="60,0 66,24 54,24" transform="rotate(60 60 60)"/><polygon points="60,0 66,24 54,24" transform="rotate(90 60 60)"/>
+    <polygon points="60,0 66,24 54,24" transform="rotate(120 60 60)"/><polygon points="60,0 66,24 54,24" transform="rotate(150 60 60)"/>
+    <polygon points="60,0 66,24 54,24" transform="rotate(180 60 60)"/><polygon points="60,0 66,24 54,24" transform="rotate(210 60 60)"/>
+    <polygon points="60,0 66,24 54,24" transform="rotate(240 60 60)"/><polygon points="60,0 66,24 54,24" transform="rotate(270 60 60)"/>
+    <polygon points="60,0 66,24 54,24" transform="rotate(300 60 60)"/><polygon points="60,0 66,24 54,24" transform="rotate(330 60 60)"/>
+  </g><circle cx="60" cy="60" r="34" fill="currentColor"/><circle cx="70" cy="54" r="24" class="luna-hueco"/><circle cx="77" cy="49" r="19" fill="currentColor"/></svg>
 </div>
+<div id="polilla" aria-hidden="true"></div>
+<svg id="grain" aria-hidden="true"><filter id="gn"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2"/></filter><rect width="100%" height="100%" filter="url(#gn)"/></svg>
 
-<!-- the seal: the one fixed star -->
-<button id="seal" aria-label="El sello — drag for the hour, hold for la otra mitad" title="día/noche · mantén para la otra mitad">
-  <svg viewBox="0 0 120 120">
-    <g fill="currentColor">
-      <g id="rays"></g>
-      <circle cx="60" cy="60" r="30"/>
-      <circle id="moonhole" cx="66" cy="56" r="21" fill="var(--paper)"/>
-      <circle id="moon" cx="72" cy="52" r="17" fill="currentColor"/>
-    </g>
-  </svg>
+<!-- the clock: the one fixed instrument -->
+<div id="reloj" aria-hidden="true"><span id="reloj-h">06:12</span><span id="reloj-l">PRIMERA LUZ</span></div>
+
+<!-- the seal: hold for la otra mitad -->
+<button id="sello" aria-label="Mantén presionado para la otra mitad — hold for the Spanish layer and margin notes" title="mantén para la otra mitad">
+  <svg viewBox="0 0 120 120"><g fill="currentColor"><circle cx="60" cy="60" r="30"/><circle cx="66" cy="56" r="21" class="sello-hueco"/><circle cx="72" cy="52" r="17" fill="currentColor"/></g></svg>
 </button>
 
+<main>
+
+<!-- ============ 06:12 — PRIMERA LUZ ============ -->
+<section class="hora" id="h-alba" data-hour="6.2" data-label="PRIMERA LUZ">
+  <div class="col">
+    <p class="marca">06:12 · CALL TIME</p>
+    <h1>Sofía González<br>Irigoyen</h1>
+    <p class="lede en-txt">Creative producer, editor, and filmmaker. This site is one production day. Scroll, and the sun moves. It ends where the name comes from.</p>
+    <p class="lede es">Productora creativa, editora y cineasta. Este sitio es un día de producción. Haz scroll y el sol se mueve. Termina donde nace el nombre.</p>
+    <p class="note">todos mis días terminan a la misma hora. ya verás.</p>
+
+    <div class="p callsheet">
+      <div class="cs-head">HOJA DE LLAMADO <span class="en-txt">call sheet · today</span><span class="es">hoy</span></div>
+      <a href="#h-anuncio"><span>08:30</span><b>EL ANUNCIO</b><i>advertising</i></a>
+      <a href="#h-corte"><span>11:00</span><b>EL CORTE</b><i>editing</i></a>
+      <a href="#h-maquina"><span>13:00</span><b>LA MÁQUINA</b><i>tools & AI craft</i></a>
+      <a href="#h-transmision"><span>15:00</span><b>LA TRANSMISIÓN</b><i>broadcast</i></a>
+      <a href="#h-set"><span>17:45</span><b>EL SET</b><i>narrative & documentary</i></a>
+      <a href="#h-eclipse"><span>19:38</span><b>EL ECLIPSE</b><i>dusk</i></a>
+      <a href="#h-funcion"><span>21:00</span><b>LA FUNCIÓN</b><i>the screening</i></a>
+      <a href="#h-imagen"><span>00:00</span><b>LA IMAGEN</b><i>paint & design</i></a>
+      <a href="#h-nym"><span>01:30</span><b>NOCHE Y MEDIA</b><i>the reason</i></a>
+    </div>
+    <p class="hint en-txt">hold the seal, anywhere, for la otra mitad</p>
+    <p class="hint es">mantén el sello, donde sea, para la otra mitad</p>
+  </div>
+</section>
+
+<!-- ============ 08:30 — EL ANUNCIO ============ -->
+<section class="hora" id="h-anuncio" data-hour="8.5" data-label="EL ANUNCIO">
+  <div class="col">
+    <p class="marca">08:30 · LA AGENCIA DESPIERTA</p>
+    <h2>El anuncio <span class="gloss en-txt">· advertising</span><span class="gloss es">· publicidad</span></h2>
+    <div class="p exp">
+      <div class="exp-head"><b>US BANK × NFL — REAL MVP</b><span>2026 · SUPERGOOD</span></div>
+      <div class="still"></div>
+      <p class="en-txt">Editor on the NFL sponsorship campaign: 9:16 masters for Meta, Pinterest and Snapchat, athlete interview episodes, string-out through client review on Frame.io. Plus brand screens for branch signage, retouching a fix an external vendor couldn't deliver, and Super Bowl concepting.</p>
+      <p class="es">Editora de la campaña NFL: masters 9:16, episodios de entrevistas, del string-out a la revisión con cliente. Además: pantallas de sucursal, retoque que un proveedor externo no pudo resolver, y conceptos para el Super Bowl.</p>
+      <p class="note">el punto del FDIC no puede llevar punto final. ahora lo sé.</p>
+    </div>
+    <div class="recibo"><span>10:58 AM</span>"SOFIA you rule" <i>— Bob Winter, Chief Creative Officer, in #general</i></div>
+    <div class="p exp chica">
+      <div class="exp-head"><b>ADLAB — CAPITAL ONE · MASSDOT · AAF</b><span>2026 · PRODUCER</span></div>
+      <p class="en-txt">Six deliverables across social and broadcast; primary client contact, vetting meetings, all pre- and post-production logistics. "Above and Beyond" AdLabbie.</p>
+      <p class="es">Seis entregas; contacto directo con clientes y toda la logística de pre y post.</p>
+    </div>
+    <div class="p exp chica">
+      <div class="exp-head"><b>ONLY HUMANS CAN</b><span>2025 · SPEC</span></div>
+      <p class="en-txt">A SAG-AFTRA anti-AI ad mockup, made by the person who now builds AI pipelines. Both are honest.</p>
+      <p class="es">Un anuncio anti-IA hecho por quien ahora construye pipelines de IA. Las dos cosas son honestas.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 11:00 — EL CORTE ============ -->
+<section class="hora" id="h-corte" data-hour="11" data-label="EL CORTE">
+  <div class="col">
+    <p class="marca">11:00 · EN EL TIMELINE</p>
+    <h2>El corte <span class="gloss en-txt">· editing</span><span class="gloss es">· edición</span></h2>
+    <div class="recibo"><span>11:57 AM</span>"wait i have an idea and its quicker and easiest" <i>— her, mid-fix, to her boss</i></div>
+    <div class="p exp">
+      <div class="exp-head"><b>THE CUT OF EVERYTHING</b><span>2023–26</span></div>
+      <p class="en-txt">Real MVP episodes. Brand screens in five aspect ratios. Live with TY: chief editor, ten weekly deliverables, all show graphics and the intro animation. Editor first, whatever the credit says.</p>
+      <p class="es">Episodios de Real MVP. Pantallas en cinco formatos. Live with TY: editora en jefe, diez entregas semanales. Editora primero, diga lo que diga el crédito.</p>
+      <p class="note">"I'll have something concrete by midday." — y lo hubo.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 13:00 — LA MÁQUINA ============ -->
+<section class="hora" id="h-maquina" data-hour="13" data-label="LA MÁQUINA">
+  <div class="col">
+    <p class="marca">13:00 · ENTRE ENTREGAS</p>
+    <h2>La máquina <span class="gloss en-txt">· tools & AI craft</span><span class="gloss es">· herramientas</span></h2>
+    <div class="p exp">
+      <div class="exp-head"><b>STUDIO S</b><span>2026 · BUILT IN TWO WEEKS</span></div>
+      <p class="en-txt">An internal desktop tool: script-to-shot-list breakdown, guided prompt builder, generation tracker with per-shot costs for client billing. Demoed to agency leadership. Built between deliveries, because the deliveries needed it.</p>
+      <p class="es">Herramienta interna: desglose de guion a shot list, constructor de prompts, y registro de costos por toma. Presentada a la dirección. Construida entre entregas, porque las entregas la necesitaban.</p>
+      <p class="note">la productora que programa.</p>
+    </div>
+    <div class="recibo"><span>4:11 PM</span>"whoa. I love it … how?" <i>— Andrew, senior editor, reviewing an AI shot she built from leftover credits</i></div>
+  </div>
+</section>
+
+<!-- ============ 15:00 — LA TRANSMISIÓN ============ -->
+<section class="hora" id="h-transmision" data-hour="15" data-label="LA TRANSMISIÓN">
+  <div class="col">
+    <p class="marca">15:00 · AL AIRE</p>
+    <h2>La transmisión <span class="gloss en-txt">· broadcast</span><span class="gloss es">· televisión</span></h2>
+    <div class="p exp">
+      <div class="exp-head"><b>BAY STATE</b><span>2025–26 · PRODUCER</span></div>
+      <div class="still"></div>
+      <p class="en-txt">Producer of the longest-running continuously produced student soap opera in the United States. Multicam, weekly, relentless. BUTV10.</p>
+      <p class="es">Productora de la telenovela estudiantil más antigua de Estados Unidos. Multicámara, semanal, sin tregua.</p>
+      <p class="note">una telenovela. mi abuela estaría orgullosa.</p>
+    </div>
+    <div class="p exp chica">
+      <div class="exp-head"><b>TELEMUNDO 52 — ACCESO TOTAL</b><span>2025 · NBCU, LOS ÁNGELES</span></div>
+      <p class="en-txt">Marketing intern on the lifestyle show floor: booking, on-location segments, red carpets, VOs and SOTs.</p>
+      <p class="es">Práctica en el piso del show: booking, segmentos en locación, alfombras rojas.</p>
+    </div>
+    <div class="p exp chica">
+      <div class="exp-head"><b>LA RED · TVI — SANTIAGO</b><span>2022 / 2024 · CHILE</span></div>
+      <p class="en-txt">Live TV in Santiago: Sabores, Zona de Estrellas, ¡Hola Chile! On-set producer for a full episode. Plus The Wire (director) and Good Morning BU (writer, correspondent).</p>
+      <p class="es">TV en vivo en Santiago; productora en set de un episodio completo. Más The Wire (directora) y GMBU (guionista, corresponsal).</p>
+    </div>
+    <div class="recibo"><span>3:23 PM</span>"She's an editor, she's an animator, she's an AI maker, she's a machine." <i>— Elana King, Win of the Week, to the whole company</i></div>
+  </div>
+</section>
+
+<!-- ============ 17:45 — EL SET (hora dorada) ============ -->
+<section class="hora" id="h-set" data-hour="17.75" data-label="EL SET · HORA DORADA">
+  <div class="col">
+    <p class="marca">17:45 · HORA DORADA, ÚLTIMA TOMA</p>
+    <h2>El set <span class="gloss en-txt">· narrative & documentary</span><span class="gloss es">· ficción y documental</span></h2>
+    <p class="lede en-txt">Every role on a set: gaffer, grip, sound, camera, director, producer. This is the hour that trained all the others.</p>
+    <p class="lede es">Todos los puestos de un set: gaffer, grip, sonido, cámara, dirección, producción. Esta es la hora que entrenó a todas las demás.</p>
+    <div class="p exp">
+      <div class="exp-head"><b>SI SOLAMENTE</b><span>2026 · PRODUCER</span></div>
+      <div class="still"></div>
+      <p class="en-txt">Kerlin Campos' thesis film: an immigrant family under threat, made by a majority-immigrant crew. Creative producer, not just line. Swept BU's Redstone Festival — Best Picture, Editing, Sound, Screenplay, Production Design, Actor. Cilect submission. Poster design: hers.</p>
+      <p class="es">La tesis de Kerlin Campos: una familia inmigrante bajo amenaza, hecha por un equipo mayoritariamente inmigrante. Productora creativa. Arrasó en Redstone. El poster también es suyo.</p>
+      <p class="note">este rodaje casi se muere dos veces. lo salvamos con tacos.</p>
+      <div class="laurel">★ BEST PICTURE · REDSTONE 2026</div>
+    </div>
+    <div class="p exp chica">
+      <div class="exp-head"><b>PAJUYUK</b><span>2026 · DOCUMENTAL</span></div>
+      <p class="en-txt">Post team, and the film's US-premiere representative at True/False. The Napuruna midwives of the Ecuadorian Amazon, renewing their ancestral wisdom. Also screened at Festival de Málaga.</p>
+      <p class="es">Equipo de post y representante del estreno en EE.UU. en True/False. Las parteras Napuruna del Alto Napo.</p>
+    </div>
+    <div class="p exp chica">
+      <div class="exp-head"><b>SHORTS</b><span>2023–24</span></div>
+      <p class="en-txt">Birds Eye View (director, showcase pick). Lucky Streak (narrative doc). Don't Forget to Swing Wilbur — OCD as an everyday horror film.</p>
+      <p class="es">Birds Eye View (directora). Lucky Streak. Swing Wilbur: el TOC como película de terror cotidiana.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 19:38 — EL ECLIPSE ============ -->
+<section class="hora" id="h-eclipse" data-hour="19.63" data-label="EL ECLIPSE">
+  <div class="col centrado">
+    <p class="marca">19:38 · EL SOL SE VA, LA LUNA LLEGA</p>
+    <h2 class="grande">Día y noche.<br>English y español.</h2>
+    <p class="lede en-txt">Half the year in Miami, half in México, until sixteen. Two trained voices — opera and mariachi. Not split between two halves: more than one whole. Watch the sky.</p>
+    <p class="lede es">Medio año en Miami, medio en México, hasta los dieciséis. Dos voces entrenadas: ópera y mariachi. No dividida en mitades: más que un entero. Mira el cielo.</p>
+  </div>
+</section>
+
+<!-- ============ 21:00 — LA FUNCIÓN ============ -->
+<section class="hora" id="h-funcion" data-hour="21" data-label="LA FUNCIÓN">
+  <div class="col">
+    <p class="marca">21:00 · LA FUNCIÓN EMPIEZA</p>
+    <h2>La función <span class="gloss en-txt">· the screening</span><span class="gloss es">· la proyección</span></h2>
+    <div class="monitor">
+      <div class="mon-screen">
+        <div class="bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <button class="mon-play" id="play-reel">▶ REEL 2026</button>
+        <button class="mon-off" id="off-reel" hidden>APAGAR</button>
+      </div>
+      <p class="mon-cap en-txt">the cut of everything, playing in the dark, as intended</p>
+      <p class="mon-cap es">el corte de todo, proyectado a oscuras, como debe ser</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 00:00 — LA IMAGEN ============ -->
+<section class="hora" id="h-imagen" data-hour="24" data-label="MEDIANOCHE · LA IMAGEN">
+  <div class="col">
+    <p class="marca">00:00 · TODOS DUERMEN</p>
+    <h2>La imagen <span class="gloss en-txt">· paint & design</span><span class="gloss es">· pintura y diseño</span></h2>
+    <div class="p exp">
+      <div class="exp-head"><b>SOFIRICHOF.ART</b><span>2017–22 · THE FIRST BODY OF WORK</span></div>
+      <div class="still pink"></div>
+      <p class="en-txt">Five years of gouache, ink, and line portraits before film took over. The painter never left: she designs the posters, letters the titles, retouches the frames.</p>
+      <p class="es">Cinco años de gouache, tinta y retratos a línea antes del cine. La pintora nunca se fue: hace los posters, rotula los títulos, retoca los cuadros.</p>
+      <p class="note">esto es lo que hago cuando nadie pide nada.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 01:30 — NOCHE Y MEDIA ============ -->
+<section class="hora" id="h-nym" data-hour="25.5" data-label="NOCHE Y MEDIA">
+  <div class="col centrado">
+    <p class="marca">01:30 · LA HORA QUE ES MÍA</p>
+    <div id="nym-marca" aria-hidden="true">
+      <svg viewBox="0 0 120 120"><g fill="currentColor"><g id="nym-rays"></g><circle cx="60" cy="60" r="30"/><circle cx="66" cy="56" r="21" class="nym-hueco"/><circle cx="72" cy="52" r="17" fill="currentColor"/></g></svg>
+    </div>
+    <h2 class="grande">Noche y Media</h2>
+    <p class="lede en-txt">The hour after everyone wraps. The extra half that belongs to her — where the personal work gets made, and where this site was always heading. The person still up at this hour is the one you write to.</p>
+    <p class="lede es">La hora después de que todos terminan. La media que es suya — donde se hace el trabajo personal, y hacia donde este sitio venía desde el principio. La persona que sigue despierta a esta hora es a quien le escribes.</p>
+
+    <div class="p sobre-p">
+      <div class="cs-head">EL SOBRE <span class="en-txt">· write to the one still awake</span><span class="es">· escríbele a la que sigue despierta</span></div>
+      <div class="sobre-links">
+        <a href="mailto:sofiagi@bu.edu">sofiagi@bu.edu</a>
+        <a href="https://www.linkedin.com/in/sofia-gonzalez-irigoyen-/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://www.instagram.com/sofirichof/" target="_blank" rel="noopener">@sofirichof</a>
+        <a href="https://www.instagram.com/sofirichof.art/" target="_blank" rel="noopener">@sofirichof.art</a>
+        <a href="https://www.youtube.com/watch?v=saYu8WDDYMY" target="_blank" rel="noopener">Reel</a>
+      </div>
+      <div class="nota-mini">
+        <span>Line producer ✓</span><span>Creative producer ✓</span><span>Editor · post ✓</span><span>AI pipeline ✓</span><span>EN ↔ ES ✓</span>
+      </div>
+    </div>
+    <p class="pie">CDMX · MIA · BOS · NYC — hecho a la 1:30</p>
+  </div>
+</section>
+
+</main>
 <script src="world.js"></script>
 </body>
 </html>
