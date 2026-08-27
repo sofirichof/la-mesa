@@ -1,30 +1,25 @@
-# La Mesa
+# Noche y Media — el día
 
-The living portfolio of Sofía González Irigoyen — Noche y Media Productions.
+The living portfolio of Sofía González Irigoyen. **The world is the hour**: the site is one production day, 06:12 → 01:30, and scrolling moves the sun.
 
-One master shot: the whole site is a single production table, drawn once. There are no pages; the camera moves. Light is the state system — the room follows the visitor's real clock from día to noche, and the eclipse seal in the corner scrubs the hour or, held down, reveals *la otra mitad* (Spanish, and the handwritten margin notes).
+Every body of work lives at its real hour, in its real light — el anuncio in the morning, el corte at 11, la máquina at 13, la transmisión at 15, el set at golden hour, la función at 21:00, la imagen at midnight. At 19:38 the sun and moon converge and eclipse: the mark forms in the sky. The day ends at **la noche y media (01:30)** — the hour after everyone wraps, where the name, the story, and the envelope live.
 
 ## The laws
 
-1. **El plano maestro** — everything reachable exists on the table from frame one. Navigation is a camera move; nothing loads twice.
-2. **La cámara es un personaje** — eased dollies, parallax lean, no cuts (except the lens, which cuts like a slate clap).
-3. **Dos maneras de moverse** — scroll rides the composed path; drag roams free.
-4. **La luz es el estado** — no theme toggle, an hour. Shadows move; night converges on the lamp.
-5. **Todo es utilería** — no navbar, no modals, no buttons that aren't paper. The seal is the only screen-fixed element.
-6. **El mundo no te necesita** — steam, the moth, breathing paper. Idle life runs whether or not anyone is watching.
-
-Full treatment: the "La Mesa" artifact (concept v1, agosto 2026).
+1. **La hora es el mundo** — sky, light, shadows, the clock, the sun, and the moon all derive from one number. The hour anchors to the sections themselves, so the clock never lies about where you are.
+2. **Cada obra en su luz** — work is graded by the time of day it belongs to, never displayed in neutral light.
+3. **La otra mitad** — hold the seal (or press M): every text flips to Spanish and the handwritten margins appear. Both halves always exist; the lens only changes which one is on top.
+4. **Recibos reales** — the floating timestamps are real, quoted from the record.
+5. **Nada sale del mundo** — the reel plays in-page on the monitor; the call sheet is the index; the only fixed instruments are the clock and the seal.
 
 ## Run it
-
-Any static server, e.g.
 
 ```
 python3 -m http.server 4173
 ```
 
-No framework, no build step. Vanilla HTML/CSS/JS, deployable on GitHub Pages.
+Vanilla HTML/CSS/JS, no build step, GitHub Pages ready.
 
 ## Status
 
-Phase 1–2: world engine, lighting model, the deal, cards → fans, drawer, envelope, index sheet. Visuals intentionally rough; art pass comes after the build (real lettering, shot objects, video on the monitor).
+World engine + content structure complete; visuals are placeholder by agreement (the art pass — her lettering, real stills, photographed objects — comes next).

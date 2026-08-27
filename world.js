@@ -1,254 +1,219 @@
-/* ============ LA MESA — world engine ============
-   One master shot. The camera is a character. Light is the state system. */
+/* ============ NOCHE Y MEDIA — the day engine ============
+   Scroll is the hour. Sky, light, clock, sun, and moon all derive
+   from one number: h (06:12 → 01:30). English by default; the seal
+   switches the whole site to Spanish — one language at a time. */
 
 (() => {
-  const WORLD = { w: 4200, h: 2600 };
-  const frame = document.getElementById('frame');
-  const world = document.getElementById('world');
-  const root  = document.documentElement;
-
-  /* ---------- camera ---------- */
-  const cam = { x: 2100, y: 1500, z: 1.0 };          // current
-  const tgt = { x: 2100, y: 1500, z: 1.0 };          // target
+  const root = document.documentElement;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const LERP = reduced ? 1 : 0.075;
 
-  let vw = innerWidth, vh = innerHeight;
-  addEventListener('resize', () => { vw = innerWidth; vh = innerHeight; });
+  const DAY_START = 6.2, DAY_END = 25.5;
 
-  function clampTarget() {
-    const minZ = Math.max(vw / WORLD.w, vh / WORLD.h) * 1.02;
-    tgt.z = Math.min(2.2, Math.max(minZ, tgt.z));
-    const hw = vw / (2 * tgt.z), hh = vh / (2 * tgt.z);
-    tgt.x = Math.min(WORLD.w - hw, Math.max(hw, tgt.x));
-    tgt.y = Math.min(WORLD.h - hh, Math.max(hh, tgt.y));
-  }
-
-  /* mouse lean — leaning over the table */
-  const lean = { x: 0, y: 0 };
-  addEventListener('pointermove', e => {
-    lean.x = (e.clientX / vw - 0.5) * 10;
-    lean.y = (e.clientY / vh - 0.5) * 7;
-  }, { passive: true });
-
-  function render() {
-    cam.x += (tgt.x - cam.x) * LERP;
-    cam.y += (tgt.y - cam.y) * LERP;
-    cam.z += (tgt.z - cam.z) * LERP;
-    const lx = reduced ? 0 : lean.x, ly = reduced ? 0 : lean.y;
-    const tx = vw / 2 - (cam.x + lx) * cam.z;
-    const ty = vh / 2 - (cam.y + ly) * cam.z;
-    world.style.transform = `translate3d(${tx}px, ${ty}px, 0) scale(${cam.z})`;
-  }
-
-  /* ---------- the ride (scroll = composed dolly path) ---------- */
-  const PATH = [
-    { x: 2100, y: 1500, z: 1.05 },   // la llegada
-    { x: 2050, y: 1180, z: 1.0  },   // la mano
-    { x: 640,  y: 1180, z: 1.0  },   // el monitor
-    { x: 2100, y: 380,  z: 0.95 },   // la tabla completa
-    { x: 2850, y: 1800, z: 1.0  },   // la ficción
-    { x: 3560, y: 1120, z: 1.0  },   // el cajón
-    { x: 2880, y: 2240, z: 1.1  },   // el sobre
+  /* ---------- sky keyframes: [hour, skyTop, skyBottom, sunAmount] ---------- */
+  const SKY = [
+    [6.2,  '#D98A7E', '#F3D9B8', 0.35],
+    [8.5,  '#E8CFAE', '#FAF5DD', 0.85],
+    [11.0, '#EADFC0', '#FAF5DD', 1.0 ],
+    [15.0, '#E4D2A8', '#F7EDD2', 1.0 ],
+    [17.75,'#E8A33D', '#E9C28F', 0.9 ],
+    [19.63,'#C36560', '#4A4A7E', 0.45],
+    [21.0, '#2A3260', '#1E2749', 0.1 ],
+    [24.0, '#161D3E', '#10142A', 0.0 ],
+    [25.5, '#0C1024', '#090C1E', 0.0 ],
   ];
-  let t = 0; // 0..PATH.length-1
-  function pathAt(u) {
-    const i = Math.max(0, Math.min(PATH.length - 2, Math.floor(u)));
-    const f = Math.min(1, Math.max(0, u - i));
-    const e = f * f * (3 - 2 * f); // smoothstep between waypoints
-    const a = PATH[i], b = PATH[i + 1];
-    return { x: a.x + (b.x - a.x) * e, y: a.y + (b.y - a.y) * e, z: a.z + (b.z - a.z) * e };
-  }
-  addEventListener('wheel', e => {
-    e.preventDefault();
-    t = Math.min(PATH.length - 1, Math.max(0, t + e.deltaY * 0.0016));
-    Object.assign(tgt, pathAt(t));
-    clampTarget();
-  }, { passive: false });
 
-  /* ---------- the roam (drag = drift) ---------- */
-  let drag = null;
-  frame.addEventListener('pointerdown', e => {
-    if (e.target.closest('a, button, .card, #cajon, #sobre')) return;
-    drag = { x: e.clientX, y: e.clientY, cx: tgt.x, cy: tgt.y };
-    frame.classList.add('dragging');
-    frame.setPointerCapture(e.pointerId);
-  });
-  frame.addEventListener('pointermove', e => {
-    if (!drag) return;
-    tgt.x = drag.cx - (e.clientX - drag.x) / cam.z;
-    tgt.y = drag.cy - (e.clientY - drag.y) / cam.z;
-    clampTarget();
-  });
-  addEventListener('pointerup', () => { drag = null; frame.classList.remove('dragging'); });
-
-  function goTo(x, y, z) { tgt.x = x; tgt.y = y; if (z) tgt.z = z; clampTarget(); }
-
-  /* ---------- light is the state system ---------- */
-  let hourOverride = null;          // null = the visitor's real clock
-  function hourNow() {
-    if (hourOverride !== null) return hourOverride;
-    const d = new Date();
-    return d.getHours() + d.getMinutes() / 60;
-  }
-  function applyLight() {
-    const h = hourNow();
-    // sun: 0 at night, 1 midday — smooth dawn 6–9, dusk 17.5–20.5
-    const up = Math.min(1, Math.max(0, (h - 6) / 3));
-    const down = Math.min(1, Math.max(0, (20.5 - h) / 3));
-    const sun = Math.min(up, down);
-    const lamp = 1 - sun;
-    // shadow direction swings across the day; at night it shortens toward the lamp
-    const ang = ((h - 13) / 12) * Math.PI;
-    const len = 8 + 14 * (1 - sun) * sun * 4 * 0.5 + 6 * sun;
-    const shx = (Math.sin(ang) * len * sun - 4 * lamp).toFixed(1);
-    const shy = (Math.abs(Math.cos(ang)) * len * 0.9 * sun + 6 * lamp).toFixed(1);
-    root.style.setProperty('--sun', sun.toFixed(3));
-    root.style.setProperty('--lamp', lamp.toFixed(3));
-    root.style.setProperty('--shx', shx + 'px');
-    root.style.setProperty('--shy', shy + 'px');
-    root.style.setProperty('--sha', (0.22 + 0.18 * sun).toFixed(3));
-    root.style.setProperty('--grade-a', (lamp * 0.88).toFixed(3));
-  }
-  applyLight();
-  setInterval(applyLight, 30_000);
-
-  /* ---------- el sello: drag scrubs the hour, click flips, hold = lens ---------- */
-  const seal = document.getElementById('seal');
-  // build the 12 rays
-  const rays = seal.querySelector('#rays');
-  for (let i = 0; i < 12; i++) {
-    const p = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-    p.setAttribute('points', '60,2 65,26 55,26');
-    p.setAttribute('transform', `rotate(${i * 30} 60 60)`);
-    rays.appendChild(p);
-  }
-  let holdTimer = null, held = false, sealDrag = null;
-  seal.addEventListener('pointerdown', e => {
-    sealDrag = { x: e.clientX, h: hourNow(), moved: false };
-    holdTimer = setTimeout(() => { held = true; root.classList.add('lens'); }, 350);
-    seal.setPointerCapture(e.pointerId);
-  });
-  seal.addEventListener('pointermove', e => {
-    if (!sealDrag) return;
-    const dx = e.clientX - sealDrag.x;
-    if (Math.abs(dx) > 6) {
-      sealDrag.moved = true;
-      clearTimeout(holdTimer);
-      hourOverride = (sealDrag.h + dx / 12 + 24) % 24;   // ~12px per hour
-      applyLight();
-    }
-  });
-  seal.addEventListener('pointerup', () => {
-    clearTimeout(holdTimer);
-    if (held) { root.classList.remove('lens'); held = false; }
-    else if (sealDrag && !sealDrag.moved) {
-      // flip: jump between 14h and 23h
-      const sun = parseFloat(getComputedStyle(root).getPropertyValue('--sun'));
-      hourOverride = sun > 0.5 ? 23 : 14;
-      applyLight();
-    }
-    sealDrag = null;
-  });
-  addEventListener('keydown', e => {
-    if (e.key === 'm') root.classList.toggle('lens');
-    if (e.key === 'n') { hourOverride = 23; applyLight(); }
-    if (e.key === 'd') { hourOverride = 14; applyLight(); }
-    if (e.key === 'ArrowLeft')  { tgt.x -= 240; clampTarget(); }
-    if (e.key === 'ArrowRight') { tgt.x += 240; clampTarget(); }
-    if (e.key === 'ArrowUp')    { tgt.y -= 240; clampTarget(); }
-    if (e.key === 'ArrowDown')  { tgt.y += 240; clampTarget(); }
-  });
-
-  /* ---------- el reparto: the deal ---------- */
-  const HANDS = {
-    recruiter: ['transmision', 'anuncio', 'ficcion', 'corte', 'documental', 'imagen', 'maquina'],
-    agencia:   ['anuncio', 'corte', 'maquina', 'imagen', 'ficcion', 'transmision', 'documental'],
-    director:  ['ficcion', 'documental', 'corte', 'imagen', 'transmision', 'anuncio', 'maquina'],
-    chisme:    ['imagen', 'ficcion', 'documental', 'transmision', 'anuncio', 'corte', 'maquina'],
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const ease = t => t * t * (3 - 2 * t);
+  const hexLerp = (c1, c2, t) => {
+    const p = x => [parseInt(x.slice(1,3),16), parseInt(x.slice(3,5),16), parseInt(x.slice(5,7),16)];
+    const [r1,g1,b1] = p(c1), [r2,g2,b2] = p(c2);
+    return `rgb(${Math.round(lerp(r1,r2,t))},${Math.round(lerp(g1,g2,t))},${Math.round(lerp(b1,b2,t))})`;
   };
-  const FANS = {
-    transmision: { x: 760,  y: 1980 }, anuncio: { x: 1380, y: 560 },
-    ficcion:     { x: 2850, y: 1800 }, documental: { x: 3380, y: 2020 },
-    corte:       { x: 520,  y: 600 },  imagen:  { x: 3350, y: 520 },
-    maquina:     { x: 2380, y: 520 },
-  };
-  function deal(aud) {
-    const order = HANDS[aud];
-    order.forEach((name, i) => {
-      const c = document.getElementById('c-' + name);
-      const arc = (i - 3) * 0.16;                       // fan around the hand
-      c.style.setProperty('--x', 2050 + Math.sin(arc) * 620);
-      c.style.setProperty('--y', 1210 + Math.abs(i - 3) * 26 - 40);
-      c.style.setProperty('--r', (i - 3) * 4);
-      c.style.zIndex = 10 - Math.abs(i - 3);
-    });
-    root.classList.add('dealt');
-    if (aud === 'chisme') setTimeout(() => document.getElementById('cajon').classList.add('open'), 900);
-    setTimeout(() => { t = 1; goTo(2050, 1180, 1.0); }, 350);
-    try { localStorage.setItem('mesa-aud', aud); } catch (_) {}
-  }
-  document.querySelectorAll('.chip').forEach(ch =>
-    ch.addEventListener('click', () => deal(ch.dataset.aud)));
 
-  /* ---------- cards open their fans (a push-in, not a page) ---------- */
-  document.querySelectorAll('.card').forEach(card => {
-    card.setAttribute('tabindex', '0');
-    const open = () => {
-      const name = card.dataset.card;
-      document.querySelectorAll('.card').forEach(c => c.classList.toggle('active', c === card));
-      document.querySelectorAll('.fan').forEach(f =>
-        f.classList.toggle('open', f.id === 'fan-' + name));
-      const f = FANS[name];
-      goTo(f.x, f.y + 30, 1.18);
-    };
-    card.addEventListener('click', open);
-    card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
-  });
-
-  /* ---------- drawer & envelope ---------- */
-  const cajon = document.getElementById('cajon');
-  cajon.addEventListener('click', e => {
-    if (e.target.closest('a')) return;
-    cajon.classList.toggle('open');
-    if (cajon.classList.contains('open')) goTo(3560, 1170, 1.12);
-  });
-  cajon.addEventListener('keydown', e => { if (e.key === 'Enter') cajon.classList.toggle('open'); });
-  const sobre = document.getElementById('sobre');
-  sobre.addEventListener('click', e => {
-    if (e.target.closest('a')) return;
-    sobre.classList.toggle('open');
-    if (sobre.classList.contains('open')) goTo(2900, 2280, 1.2);
-  });
-  sobre.addEventListener('keydown', e => { if (e.key === 'Enter') sobre.classList.toggle('open'); });
-
-  /* ---------- idle physics: the world doesn't need you ---------- */
+  const sol = document.getElementById('sol');
+  const luna = document.getElementById('luna');
+  const relojH = document.getElementById('reloj-h');
+  const relojL = document.getElementById('reloj-l');
   const moth = document.getElementById('polilla');
-  const LAMP = { x: 3050, y: 830 };
-  let mt = Math.random() * 100;
-  function idle() {
-    if (!reduced) {
-      mt += 0.016;
-      const r = 70 + Math.sin(mt * 1.7) * 26;
-      const mx = LAMP.x + Math.cos(mt * 1.1) * r + Math.sin(mt * 3.7) * 9;
-      const my = LAMP.y - 26 + Math.sin(mt * 1.4) * (r * 0.45) + Math.cos(mt * 4.3) * 7;
-      moth.style.transform = `translate(${mx}px, ${my}px) rotate(${Math.sin(mt * 5) * 24}deg)`;
-      moth.style.opacity = getComputedStyle(root).getPropertyValue('--lamp').trim();
-    }
-    render();
-    requestAnimationFrame(idle);
-  }
+  const zones = [...document.querySelectorAll('.hora')];
 
-  /* ---------- boot: the table draws itself, then the ink floods in ---------- */
-  addEventListener('load', () => {
-    setTimeout(() => root.classList.remove('boot'), reduced ? 0 : 950);
-    // returning visitor with a dealt hand keeps their table as they left it
-    try {
-      const aud = localStorage.getItem('mesa-aud');
-      if (aud && HANDS[aud]) { deal(aud); }
-    } catch (_) {}
+  function fmtHour(h) {
+    const hh = Math.floor(h) % 24, mm = Math.round((h % 1) * 60) % 60;
+    return String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0');
+  }
+  const esOn = () => root.classList.contains('es');
+
+  /* ---------- hour anchors: each section's top IS its hour ---------- */
+  let MAP = [];
+  function buildMap() {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    MAP = zones.map(z => ({ y: z.offsetTop, h: parseFloat(z.dataset.hour) }));
+    MAP.push({ y: Math.max(max, MAP[MAP.length - 1].y + 1), h: DAY_END });
+  }
+  addEventListener('load', () => { buildMap(); update(); });
+  addEventListener('resize', () => { buildMap(); update(); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { buildMap(); update(); });
+
+  /* ---------- the master update ---------- */
+  let ticking = false;
+  function update() {
+    ticking = false;
+    if (!MAP.length) buildMap();
+    const y = scrollY;
+    let k = 0;
+    while (k < MAP.length - 2 && y > MAP[k + 1].y) k++;
+    const seg = Math.min(1, Math.max(0, (y - MAP[k].y) / Math.max(1, MAP[k + 1].y - MAP[k].y)));
+    const h = lerp(MAP[k].h, MAP[k + 1].h, seg);
+
+    /* sky */
+    let i = 0;
+    while (i < SKY.length - 2 && h > SKY[i + 1][0]) i++;
+    const a = SKY[i], b = SKY[i + 1];
+    const t = Math.min(1, Math.max(0, (h - a[0]) / (b[0] - a[0])));
+    const sun = lerp(a[3], b[3], t);
+    root.style.setProperty('--sky1', hexLerp(a[1], b[1], t));
+    root.style.setProperty('--sky2', hexLerp(a[2], b[2], t));
+    root.style.setProperty('--sun', sun.toFixed(3));
+    root.style.setProperty('--lamp', (1 - sun).toFixed(3));
+    root.style.setProperty('--sha', (0.16 + 0.16 * sun).toFixed(3));
+    root.style.setProperty('--stars', Math.max(0, ((1 - sun) - 0.75) / 0.25).toFixed(3));
+
+    const dayInk = sun > 0.55;
+    root.style.setProperty('--amb', dayInk ? '#2A1F1B' : '#F3ECD8');
+    root.style.setProperty('--amb-dim', dayInk ? 'rgba(42,31,27,.62)' : 'rgba(243,236,216,.65)');
+    document.body.classList.toggle('noche', !dayInk);
+
+    /* the clock */
+    relojH.textContent = fmtHour(h);
+    const zc = zones[Math.min(k, zones.length - 1)];
+    relojL.textContent = zc.dataset[esOn() ? 'labelEs' : 'labelEn'] || zc.dataset.labelEn;
+
+    /* keyframe track: [hour, x, y] with smooth easing between stops */
+    const track = (hh, kfs) => {
+      if (hh <= kfs[0][0]) return [kfs[0][1], kfs[0][2]];
+      const last = kfs[kfs.length - 1];
+      if (hh >= last[0]) return [last[1], last[2]];
+      let s = 0;
+      while (s < kfs.length - 2 && hh > kfs[s + 1][0]) s++;
+      const a = kfs[s], b = kfs[s + 1];
+      const u = ease((hh - a[0]) / (b[0] - a[0]));
+      return [lerp(a[1], b[1], u), lerp(a[2], b[2], u)];
+    };
+
+    /* the sun: natural arc all day, then eases up to the meeting point,
+       holds through the eclipse, and sinks away through the moon */
+    if (h >= 6 && h <= 20.5) {
+      let sx, sy;
+      if (h < 18.5) {
+        const sp = (h - 6.2) / (20.2 - 6.2);
+        sx = lerp(10, 90, sp);
+        sy = 78 - Math.sin(Math.PI * Math.min(1, Math.max(0, sp))) * 64;
+      } else {
+        [sx, sy] = track(h, [[18.5, 80.3, 54.2], [19.55, 50, 38], [19.9, 50, 38], [20.5, 50, 88]]);
+      }
+      sol.style.left = sx + 'vw'; sol.style.top = sy + 'vh';
+      sol.style.opacity = h > 19.95 ? Math.max(0, 1 - (h - 19.95) / 0.45) : 1;
+    } else sol.style.opacity = 0;
+
+    /* the moon: one clean rising path whose route passes through the
+       meeting point — it swallows the sun and keeps climbing */
+    if (h >= 18.6) {
+      const [mx, my] = track(h, [[18.6, 97, 82], [19.63, 50, 38], [20.0, 50, 38], [21.8, 45, 24], [25.5, 50, 16]]);
+      luna.style.left = mx + 'vw'; luna.style.top = my + 'vh';
+      luna.style.opacity = Math.min(1, (h - 18.6) / 0.5);
+    } else luna.style.opacity = 0;
+    root.classList.toggle('eclipse', h >= 19.35 && h <= 20.05);
+
+    /* moth: awake after 21h */
+    if (!reduced && h > 21) {
+      const mt = performance.now() / 1000;
+      const lx = parseFloat(luna.style.left) || 50, ly = parseFloat(luna.style.top) || 20;
+      moth.style.left = `calc(${lx}vw + ${Math.cos(mt * 1.1) * 90 + Math.sin(mt * 3.7) * 12}px)`;
+      moth.style.top = `calc(${ly}vh + ${60 + Math.sin(mt * 1.5) * 40}px)`;
+      moth.style.transform = `rotate(${Math.sin(mt * 5) * 22}deg)`;
+      moth.style.opacity = Math.min(0.9, (h - 21) / 0.8);
+    } else moth.style.opacity = 0;
+  }
+  addEventListener('scroll', () => {
+    if (document.hidden) { update(); return; }
+    if (!ticking) { ticking = true; requestAnimationFrame(update); }
+  }, { passive: true });
+  addEventListener('visibilitychange', update);
+  if (!reduced) setInterval(() => { if (parseFloat(moth.style.opacity) > 0) update(); }, 120);
+
+  /* ---------- language: one language at a time ---------- */
+  const sello = document.getElementById('sello');
+  const selloLang = document.getElementById('sello-lang');
+  function setLang(es) {
+    root.classList.toggle('es', es);
+    root.lang = es ? 'es' : 'en';
+    selloLang.textContent = es ? 'EN' : 'ES';   // the seal offers the other language
+    try { localStorage.setItem('nym-lang', es ? 'es' : 'en'); } catch (_) {}
+    buildMap(); update();
+  }
+  sello.addEventListener('click', () => setLang(!esOn()));
+  try { if (localStorage.getItem('nym-lang') === 'es') setLang(true); } catch (_) {}
+
+  /* ---------- call sheet: hover a row, see the work ---------- */
+  const stillLayer = document.getElementById('still-layer');
+  document.querySelectorAll('.callsheet a[data-still], .sheet tr[data-still]').forEach(row => {
+    const show = () => {
+      stillLayer.style.backgroundImage = `url("${row.dataset.still}")`;
+      stillLayer.classList.add('show');
+    };
+    const hide = () => stillLayer.classList.remove('show');
+    row.addEventListener('mouseenter', show);
+    row.addEventListener('mouseleave', hide);
+    row.addEventListener('focus', show);
+    row.addEventListener('blur', hide);
   });
 
-  clampTarget();
-  idle();
+  /* ---------- the screening: tonight's program ---------- */
+  const monScreen = document.querySelector('.mon-screen');
+  const hintBtn = document.getElementById('play-hint');
+  const offBtn = document.getElementById('off-reel');
+  function clearScreen() {
+    monScreen.querySelectorAll('iframe, video').forEach(el => el.remove());
+  }
+  function play(src) {
+    clearScreen();
+    let el;
+    if (src.startsWith('yt:')) {
+      el = document.createElement('iframe');
+      el.src = `https://www.youtube.com/embed/${src.slice(3)}?autoplay=1&rel=0&modestbranding=1`;
+      el.allow = 'autoplay; encrypted-media; picture-in-picture';
+      el.title = 'Reel';
+    } else {
+      el = document.createElement('video');
+      el.src = src;
+      el.controls = true;
+      el.autoplay = true;
+      el.playsInline = true;
+    }
+    monScreen.appendChild(el);
+    hintBtn.hidden = true; offBtn.hidden = false;
+  }
+  document.querySelectorAll('.programa button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.programa button').forEach(x => x.classList.toggle('on', x === btn));
+      play(btn.dataset.src);
+    });
+  });
+  offBtn.addEventListener('click', () => {
+    clearScreen();
+    hintBtn.hidden = false; offBtn.hidden = true;
+    document.querySelectorAll('.programa button').forEach(x => x.classList.remove('on'));
+  });
+
+  /* ---------- reveals ---------- */
+  if (!reduced) {
+    const io = new IntersectionObserver(es => es.forEach(en => {
+      if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+    }), { threshold: 0.18 });
+    document.querySelectorAll('.p, .recibo, .monitor, .cutouts').forEach(el => io.observe(el));
+  } else {
+    document.querySelectorAll('.p, .recibo, .monitor, .cutouts').forEach(el => el.classList.add('in'));
+  }
+
+  update();
 })();
