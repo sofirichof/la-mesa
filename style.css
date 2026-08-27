@@ -1,0 +1,272 @@
+/* ============ LA MESA — one room, one camera ============
+   Rough visuals by design (phase 1–2). The world mechanics are the deliverable. */
+
+:root{
+  --paper:#FAF5DD; --paper2:#F3E9CE; --sand:#D8C6B0;
+  --ink:#2A1F1B; --red:#9D2729; --cobalt:#2244AA; --pink:#C36560;
+  --wood1:#8A5A3B; --wood2:#6E4429; --wood-night:#3A2718;
+
+  /* lighting model — driven by world.js */
+  --sun:1;            /* 0 night … 1 day */
+  --lamp:0;           /* inverse-ish of sun */
+  --shx:10px; --shy:14px; --shb:14px; --sha:.30;
+  --grade-a:0;        /* night grade opacity */
+  --edge:rgba(250,245,221,.35); /* night-visible edge for dark objects */
+}
+
+*{box-sizing:border-box; margin:0}
+html,body{height:100%; overflow:hidden; overscroll-behavior:none}
+body{
+  background:var(--wood2); color:var(--ink);
+  font-family:Fraunces, Georgia, serif; font-size:15px; line-height:1.45;
+  -webkit-font-smoothing:antialiased;
+}
+button{font:inherit; color:inherit; background:none; border:none; cursor:pointer}
+a{color:var(--red)}
+
+/* ============ frame & world ============ */
+#frame{position:fixed; inset:0; overflow:hidden; cursor:grab}
+#frame.dragging{cursor:grabbing}
+#world{
+  position:absolute; left:0; top:0; width:4200px; height:2600px;
+  transform-origin:0 0; will-change:transform;
+}
+.layer{position:absolute; inset:0; pointer-events:none}
+.layer > *{pointer-events:auto}
+
+#wood{
+  position:absolute; inset:0; pointer-events:none;
+  background:
+    radial-gradient(1700px 1000px at 3050px 900px, rgba(255,196,110, calc(var(--lamp) * .45)), transparent 62%),
+    repeating-linear-gradient(93deg, rgba(0,0,0,.05) 0 3px, transparent 3px 90px),
+    repeating-linear-gradient(1deg, rgba(255,255,255,.03) 0 2px, transparent 2px 140px),
+    linear-gradient(180deg, var(--wood1), var(--wood2));
+  filter:brightness(calc(.66 + .34 * var(--sun)));
+}
+.light{position:absolute; pointer-events:none; border-radius:50%}
+#lamp-pool{
+  left:2450px; top:400px; width:1250px; height:1100px;
+  background:radial-gradient(closest-side, rgba(255,196,110,.85), rgba(255,190,96,.25) 52%, transparent 72%);
+  opacity:var(--lamp); mix-blend-mode:screen; filter:blur(6px);
+}
+#window-light{
+  left:900px; top:300px; width:1500px; height:1100px; border-radius:0;
+  background:linear-gradient(115deg, rgba(255,244,214,.30) 0 46%, transparent 47% 53%, rgba(255,244,214,.22) 54% 100%);
+  opacity:calc(var(--sun) * .8); transform:skewX(-14deg); filter:blur(2px);
+}
+
+/* ============ paper & objects, placed in world units ============ */
+.p,.o{
+  position:absolute;
+  left:calc(var(--x) * 1px); top:calc(var(--y) * 1px);
+  transform:translate(-50%,-50%) rotate(calc(var(--r) * 1deg));
+  filter:drop-shadow(var(--shx) var(--shy) var(--shb) rgba(15,8,4,var(--sha)));
+  transition:filter .6s ease;
+}
+.p{
+  width:calc(var(--w) * 1px); background:var(--paper);
+  border:1.5px solid var(--ink); border-radius:2px; padding:16px 18px;
+}
+.p.hint{background:var(--paper2); font-size:12.5px; font-style:italic; text-align:center}
+.p .note{
+  font-family:Caveat, cursive; font-size:19px; color:var(--cobalt);
+  transform:rotate(-1.5deg); margin-top:8px; opacity:0; max-height:0; overflow:hidden;
+  transition:opacity .25s, max-height .25s;
+}
+
+/* la otra mitad: bilingual layers */
+.es{display:none}
+html.lens .es{display:block}
+html.lens .en-txt{display:none}
+html.lens .p .note{opacity:1; max-height:80px}
+
+/* pregunta */
+#pregunta{text-align:center; padding:26px 24px}
+#pregunta h1{font-size:44px; font-weight:640; letter-spacing:-.01em; line-height:1}
+#pregunta .es-sub{font-style:italic; opacity:.6; margin:6px 0 16px}
+.answers{display:flex; flex-direction:column; gap:9px}
+.chip{
+  border:1.6px solid var(--ink); background:var(--paper2); padding:9px 12px;
+  font-family:'Space Mono',monospace; font-size:12.5px; font-weight:700; letter-spacing:.08em;
+  text-transform:uppercase; border-radius:2px; transition:transform .3s, background .3s;
+}
+.chip:hover,.chip:focus-visible{transform:translateY(-2px) rotate(-.5deg); background:#fff8e4; outline:none}
+html.dealt #pregunta{
+  transform:translate(-50%,-50%) rotate(9deg) translate(-520px,690px) scale(.82);
+  opacity:.85; transition:transform 1.1s cubic-bezier(.22,1,.36,1), opacity 1.1s;
+}
+
+/* tabla completa */
+.sheet{font-family:'Space Mono',monospace}
+.sheet-head{display:flex; gap:12px; align-items:baseline; border-bottom:2px solid var(--ink); padding-bottom:6px; margin-bottom:8px;
+  font-weight:700; font-size:13px; letter-spacing:.18em}
+.sheet-head .en-txt,.sheet-head .es{font-weight:400; font-size:10px; letter-spacing:.14em; opacity:.55; text-transform:uppercase}
+.sheet table{border-collapse:collapse; width:100%}
+.sheet td{font-size:10.5px; padding:4.5px 6px 4px 0; border-bottom:1px solid rgba(42,31,27,.25); letter-spacing:.02em}
+.sheet td:first-child{color:var(--red); font-weight:700; white-space:nowrap}
+.sheet td:nth-child(3){white-space:nowrap; letter-spacing:.08em; font-size:9.5px}
+.sheet td:last-child{opacity:.6; font-style:italic; font-family:Fraunces,serif; font-size:11px}
+
+/* nota */
+.nota{font-family:'Space Mono',monospace; background:#FBF7E6}
+.nota-head{display:flex; justify-content:space-between; font-size:11px; font-weight:700; letter-spacing:.18em; color:var(--red);
+  border-bottom:1.5px solid var(--ink); padding-bottom:6px; margin-bottom:6px}
+.nota-row{display:flex; justify-content:space-between; font-size:12px; padding:5px 0; border-bottom:1px solid rgba(42,31,27,.25)}
+.nota-row span:last-child{color:var(--cobalt); font-weight:700}
+.nota-foot{font-size:10px; letter-spacing:.22em; padding-top:8px; text-align:center; opacity:.6}
+
+/* expedientes */
+.exp{padding:12px 14px; font-size:12.5px; line-height:1.45;
+  transition:transform 1s cubic-bezier(.22,1,.36,1), opacity .8s}
+.exp .exp-head{display:flex; justify-content:space-between; align-items:baseline; gap:8px;
+  border-bottom:1.5px solid var(--ink); padding-bottom:5px; margin-bottom:8px}
+.exp .exp-head b{font-family:'Space Mono',monospace; font-size:12.5px; letter-spacing:.08em}
+.exp .exp-head span{font-family:'Space Mono',monospace; font-size:9px; letter-spacing:.12em; color:var(--red); white-space:nowrap}
+.exp .still{height:110px; background:
+  repeating-linear-gradient(45deg, rgba(42,31,27,.14) 0 2px, transparent 2px 6px), var(--sand);
+  border:1px solid var(--ink); margin-bottom:9px}
+.exp .still.pink{background:repeating-linear-gradient(45deg, rgba(157,39,41,.15) 0 2px, transparent 2px 6px), #E9C2BC}
+.exp .laurel{margin-top:8px; font-family:'Space Mono',monospace; font-size:9.5px; font-weight:700; letter-spacing:.14em;
+  color:var(--cobalt); border:1.4px solid var(--cobalt); display:inline-block; padding:3px 7px; transform:rotate(-1deg)}
+/* fans rest folded under their lead paper until their card is active */
+.fan .exp:first-child{z-index:3}
+.fan .exp:nth-child(2),.fan .exp:nth-child(3),.fan .exp:nth-child(4){opacity:.55; z-index:1}
+.fan.open .exp{z-index:auto}
+.fan .exp:nth-child(2){transform:translate(-50%,-50%) rotate(calc(var(--r)*1deg)) translate(-70px,-70px) scale(.96)}
+.fan .exp:nth-child(3){transform:translate(-50%,-50%) rotate(calc(var(--r)*1deg)) translate(60px,-90px) scale(.96)}
+.fan .exp:nth-child(4){transform:translate(-50%,-50%) rotate(calc(var(--r)*1deg)) translate(-10px,-110px) scale(.96)}
+.fan.open .exp{opacity:1; transform:translate(-50%,-50%) rotate(calc(var(--r)*1deg))}
+
+/* cards */
+.card{
+  width:126px; background:var(--paper); border:1.6px solid var(--ink); border-radius:3px;
+  padding:8px 8px 7px; display:flex; flex-direction:column; align-items:center; gap:4px;
+  transition:transform 1s cubic-bezier(.22,1,.36,1), left 1s cubic-bezier(.22,1,.36,1), top 1s cubic-bezier(.22,1,.36,1);
+}
+.card:hover,.card:focus-visible{outline:none; transform:translate(-50%,-52%) rotate(calc(var(--r) * 1deg)) scale(1.04)}
+.card .cnum{align-self:flex-start; font-family:'Space Mono',monospace; font-weight:700; font-size:11px; color:var(--red)}
+.card svg{width:52px; height:52px; color:var(--cobalt); fill:none; stroke:currentColor; stroke-width:3}
+.card svg [fill="currentColor"]{fill:currentColor; stroke:none}
+.card .cname{font-family:'Space Mono',monospace; font-weight:700; font-size:9.5px; letter-spacing:.1em; text-align:center}
+.card .cgloss{font-family:'Space Mono',monospace; font-size:8px; letter-spacing:.14em; text-transform:uppercase; opacity:.55}
+.card.active{box-shadow:0 0 0 2.5px var(--red)}
+
+/* monitor */
+#monitor{width:340px}
+.mon-screen{height:220px; background:#111; border:10px solid #2e2a26; border-radius:6px; position:relative; overflow:hidden}
+.bars{position:absolute; inset:0; display:flex; opacity:.9; animation:flicker 4s steps(2) infinite}
+.bars i{flex:1} .bars i:nth-child(1){background:#c8c8c0}.bars i:nth-child(2){background:#c8c832}.bars i:nth-child(3){background:#32c8c8}
+.bars i:nth-child(4){background:#32c832}.bars i:nth-child(5){background:#c832c8}.bars i:nth-child(6){background:#c83232}.bars i:nth-child(7){background:#3232c8}
+@keyframes flicker{0%,96%{filter:brightness(1)}97%,100%{filter:brightness(1.12)}}
+.mon-play{
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  font-family:'Space Mono',monospace; font-weight:700; font-size:13px; letter-spacing:.14em;
+  color:#fff; background:rgba(0,0,0,.72); padding:9px 14px; border:1.5px solid #fff; text-decoration:none;
+}
+.mon-play:hover{background:var(--red)}
+.mon-base{width:110px; height:16px; background:#2e2a26; margin:0 auto; border-radius:0 0 6px 6px}
+.olabel{display:block; text-align:center; margin-top:7px; font-family:'Space Mono',monospace;
+  font-size:9.5px; font-weight:700; letter-spacing:.22em; color:var(--paper); opacity:.95;
+  text-shadow:0 1px 3px rgba(0,0,0,.6)}
+
+/* cajón */
+#cajon{width:330px}
+.cajon-lid{
+  background:linear-gradient(180deg,#9A6845,#7C4E30); border:1.5px solid var(--edge); border-radius:3px;
+  height:92px; display:flex; align-items:center; justify-content:center; position:relative; z-index:2;
+  font-family:'Space Mono',monospace; font-weight:700; letter-spacing:.24em; font-size:12px; color:var(--paper);
+  transition:transform .9s cubic-bezier(.22,1,.36,1);
+}
+.cajon-lid i{position:absolute; bottom:10px; left:50%; transform:translateX(-50%); width:56px; height:9px;
+  border:2px solid var(--paper); border-radius:5px; opacity:.8}
+.cajon-inside{
+  background:linear-gradient(180deg, rgba(195,101,96,.35), rgba(195,101,96,.12)), #4a3320;
+  border:1.5px solid var(--ink); border-top:none; margin-top:-4px; padding:14px;
+  display:none; grid-template-columns:1fr 1fr; gap:10px;
+}
+#cajon.open .cajon-lid{transform:translateY(-64px) rotate(-1.2deg)}
+#cajon.open .cajon-inside{display:grid}
+.keep{background:var(--paper); border:1.2px solid var(--ink); padding:8px; font-size:10.5px}
+.keep b{font-family:'Space Mono',monospace; font-size:9.5px; letter-spacing:.12em; color:var(--red); display:block; margin-bottom:3px}
+.keep span{display:block; font-style:italic; opacity:.7}
+.keep.postcard{transform:rotate(-2deg)} .keep.mty{transform:rotate(1.5deg)}
+.keep.sarape{min-height:44px; border:none;
+  background:repeating-linear-gradient(90deg,#9D2729 0 10px,#E8A33D 10px 18px,#2244AA 18px 30px,#F3E9CE 30px 36px,#3E8E7E 36px 46px)}
+.keep.clipping{grid-column:1 / -1; line-height:1.4; transform:rotate(.6deg)}
+.keep.paint{min-height:54px; background:linear-gradient(160deg,#E9C2BC 0 40%,#B9C4A7 40% 70%,#2244AA 70%); border-radius:2px}
+.keep.paint.p2{background:linear-gradient(20deg,#D8C6B0 0 30%,#9D2729 30% 55%,#2A1F1B 55%)}
+
+/* sobre */
+#sobre{width:300px; background:var(--paper2); border:1.5px solid var(--ink); border-radius:2px; padding:0}
+.flap{height:0; border-left:149px solid transparent; border-right:149px solid transparent;
+  border-top:74px solid #EADFC0; transform-origin:top; transition:transform .8s cubic-bezier(.22,1,.36,1); position:relative; z-index:2}
+#sobre.open .flap{transform:scaleY(-.85)}
+.sobre-face{padding:12px 16px 14px; position:relative}
+.addr{font-family:Caveat,cursive; font-size:21px; line-height:1.15; color:var(--ink)}
+.sello-postal{
+  position:absolute; right:12px; top:8px; font-family:'Space Mono',monospace; font-weight:700; font-size:11px;
+  color:var(--cobalt); border:1.6px dashed var(--cobalt); padding:8px 7px; transform:rotate(4deg);
+}
+.sobre-links{display:none; flex-direction:column; gap:6px; padding:0 16px 14px;
+  font-family:'Space Mono',monospace; font-size:12px}
+#sobre.open .sobre-links{display:flex}
+
+/* lamp & cafe */
+#lamp{width:120px; pointer-events:none}
+.lamp-shade{width:110px; height:56px; background:linear-gradient(180deg,#1E5F46,#14432F); border:1.5px solid var(--ink);
+  border-radius:55px 55px 8px 8px; box-shadow:inset 0 -14px 22px rgba(255,196,110, calc(var(--lamp) * .9))}
+.lamp-arm{width:10px; height:74px; background:#2A1F1B; margin:0 auto; border-radius:4px}
+#cafe{width:74px; pointer-events:none}
+.cup{width:52px; height:38px; background:#F3E9CE; border:1.5px solid var(--ink); border-radius:0 0 18px 18px; margin:0 auto; position:relative}
+.cup::after{content:""; position:absolute; right:-14px; top:8px; width:14px; height:16px; border:3px solid var(--ink); border-left:none; border-radius:0 8px 8px 0}
+.plato{width:70px; height:10px; background:#E9DCC3; border:1.5px solid var(--ink); border-radius:50%; margin:-4px auto 0}
+
+/* air */
+#steam{position:absolute; left:1650px; top:1560px; opacity:calc(var(--sun) * .8); pointer-events:none}
+#steam i{position:absolute; width:8px; height:34px; border-radius:8px; background:rgba(250,245,221,.5); filter:blur(4px);
+  animation:rise 3.6s ease-in-out infinite}
+#steam i:nth-child(2){left:12px; animation-delay:1.2s} #steam i:nth-child(3){left:-10px; animation-delay:2.2s}
+@keyframes rise{0%{transform:translateY(0) scaleY(.6); opacity:0}30%{opacity:.8}100%{transform:translateY(-70px) scaleY(1.3); opacity:0}}
+#polilla{position:absolute; width:11px; height:9px; background:var(--ink); border-radius:60% 60% 40% 40%;
+  opacity:0; pointer-events:none}
+#polilla::before,#polilla::after{content:""; position:absolute; top:0; width:8px; height:9px; background:#5b4a3f; border-radius:50%}
+#polilla::before{left:-6px} #polilla::after{right:-6px}
+
+/* ============ grade, vignette, grain, seal ============ */
+#grade{position:fixed; inset:0; pointer-events:none; z-index:5;
+  background:linear-gradient(180deg, rgba(16,20,52,.42), rgba(12,14,38,.5));
+  opacity:var(--grade-a); mix-blend-mode:multiply}
+#vignette{position:fixed; inset:0; pointer-events:none; z-index:6;
+  background:radial-gradient(120% 120% at 50% 46%, transparent 55%, rgba(20,10,5,.42));
+  transition:box-shadow .3s}
+html.lens #vignette{box-shadow:inset 0 0 0 5px var(--cobalt)}
+#grain{position:fixed; inset:0; width:100%; height:100%; pointer-events:none; opacity:.06; z-index:7; mix-blend-mode:multiply}
+
+#seal{
+  position:fixed; right:22px; bottom:22px; width:74px; height:74px; z-index:10;
+  color:var(--cobalt); filter:drop-shadow(2px 3px 4px rgba(0,0,0,.35));
+  transition:transform .5s cubic-bezier(.22,1,.36,1); touch-action:none;
+}
+#seal:hover{transform:rotate(8deg)} #seal:focus-visible{outline:2.5px solid var(--red); border-radius:50%}
+#seal svg{width:100%; height:100%}
+html.lens #seal{color:var(--red)}
+
+/* ============ boot: the table draws itself in cobalt line ============ */
+html.boot .p, html.boot .o > *, html.boot .card{
+  background:transparent !important; color:transparent !important;
+  border-color:var(--cobalt) !important; box-shadow:none !important;
+}
+html.boot #wood{filter:brightness(.2) saturate(.2)}
+html.boot .p *, html.boot .o *{color:transparent !important; opacity:.9}
+.p,.o > *,.card,#wood{transition:background 1s ease .1s, color .9s ease .25s, border-color 1s ease, filter 1.2s ease}
+
+/* ============ a11y & motion ============ */
+:focus-visible{outline:2.5px solid var(--red); outline-offset:2px}
+@media (prefers-reduced-motion:reduce){
+  .bars,#steam i{animation:none}
+  .card,.exp,.cajon-lid,.flap,#pregunta{transition:none !important}
+}
+@media (max-width:700px){
+  #seal{width:60px; height:60px; right:14px; bottom:14px}
+  #pregunta h1{font-size:34px}
+}
