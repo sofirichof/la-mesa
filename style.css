@@ -30,6 +30,17 @@ a{color:var(--red)}
   background:linear-gradient(180deg, var(--sky1), var(--sky2));
   transition:background .2s linear;
 }
+/* stars come out with the lamp */
+#cielo::after{
+  content:""; position:absolute; inset:0; opacity:calc(var(--lamp) * .9);
+  background-image:
+    radial-gradient(rgba(255,255,255,.85) 1px, transparent 1.7px),
+    radial-gradient(rgba(200,212,255,.55) 1px, transparent 1.5px),
+    radial-gradient(rgba(255,244,214,.4) .8px, transparent 1.3px);
+  background-size:227px 173px, 131px 199px, 83px 109px;
+  background-position:17px 23px, 67px 91px, 41px 11px;
+  mask-image:linear-gradient(180deg, #000 55%, transparent);
+}
 #sol{
   position:fixed; z-index:-2; width:92px; height:92px; border-radius:50%;
   background:radial-gradient(circle at 42% 38%, #FFE9B8, #E8A33D 62%, #D96C4F);
@@ -75,7 +86,10 @@ html.eclipse #luna{filter:drop-shadow(0 0 50px rgba(120,150,255,.65))}
 #sello svg{width:100%; height:100%}
 #sello .sello-hueco{fill:var(--sky2); transition:fill .2s linear}
 html.lens #sello{color:var(--red)}
-html.lens body,html.lens{box-shadow:inset 0 0 0 5px var(--cobalt)}
+html.lens::after{
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:80;
+  box-shadow:inset 0 0 0 5px var(--cobalt);
+}
 
 /* ============ la otra mitad ============ */
 .es{display:none}
@@ -180,7 +194,8 @@ h2.grande{font-size:clamp(44px,7vw,76px)}
 .mon-cap{font-size:13px; font-style:italic; color:var(--amb-dim); text-align:center; margin-top:12px}
 
 /* eclipse & nym */
-#h-eclipse{min-height:200vh}
+#h-eclipse{min-height:220vh}
+#h-eclipse .col{margin-top:105vh}   /* the sky speaks first; the words arrive after */
 #nym-marca{width:150px; margin:0 auto 8px; color:var(--cobalt)}
 #nym-marca svg{width:100%}
 #nym-marca .nym-hueco{fill:var(--sky2); transition:fill .2s linear}

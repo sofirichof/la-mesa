@@ -50,14 +50,29 @@
     return String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0');
   }
 
+  /* ---------- hour anchors: each section's top IS its hour ----------
+     Content heights vary by viewport, so the hour is interpolated between
+     section offsets rather than mapped uniformly to the scrollbar. */
+  let MAP = [];
+  function buildMap() {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    MAP = zones.map(z => ({ y: z.offsetTop, h: parseFloat(z.dataset.hour) }));
+    MAP.push({ y: Math.max(max, MAP[MAP.length - 1].y + 1), h: DAY_END });
+  }
+  addEventListener('load', () => { buildMap(); update(); });
+  addEventListener('resize', () => { buildMap(); update(); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { buildMap(); update(); });
+
   /* ---------- the master update: scroll → hour → world ---------- */
   let ticking = false;
   function update() {
     ticking = false;
-    const doc = document.documentElement;
-    const max = doc.scrollHeight - innerHeight;
-    const p = max > 0 ? Math.min(1, Math.max(0, scrollY / max)) : 0;
-    const h = DAY_START + p * (DAY_END - DAY_START);
+    if (!MAP.length) buildMap();
+    const y = scrollY;
+    let k = 0;
+    while (k < MAP.length - 2 && y > MAP[k + 1].y) k++;
+    const seg = Math.min(1, Math.max(0, (y - MAP[k].y) / Math.max(1, MAP[k + 1].y - MAP[k].y)));
+    const h = lerp(MAP[k].h, MAP[k + 1].h, seg);
 
     /* sky */
     let i = 0;
@@ -90,8 +105,8 @@
       const sp = (h - 6.2) / (20.2 - 6.2);
       let sx = lerp(10, 90, sp);
       let sy = 78 - Math.sin(Math.PI * Math.min(1, Math.max(0, sp))) * 64;
-      /* eclipse convergence: 19.3–19.9 the two bodies meet at (56vw, 34vh) */
-      const ec = 1 - Math.min(1, Math.abs(h - 19.63) / 0.42);
+      /* eclipse convergence: the two bodies meet at (56vw, 34vh) */
+      const ec = 1 - Math.min(1, Math.abs(h - 19.63) / 0.55);
       if (ec > 0) { sx = lerp(sx, 56, ec); sy = lerp(sy, 34, ec); }
       sol.style.left = sx + 'vw'; sol.style.top = sy + 'vh';
       sol.style.opacity = h > 19.9 ? Math.max(0, 1 - (h - 19.9) / 0.5) : 1;
@@ -103,12 +118,12 @@
       const mp = Math.min(1, (h - 18.6) / (25.5 - 18.6));
       let mx = lerp(96, 50, Math.pow(mp, 0.8));
       let my = lerp(80, 18, Math.sin(mp * Math.PI / 2));
-      const ec = 1 - Math.min(1, Math.abs(h - 19.63) / 0.42);
+      const ec = 1 - Math.min(1, Math.abs(h - 19.63) / 0.55);
       if (ec > 0) { mx = lerp(mx, 56, ec); my = lerp(my, 34, ec); }
       luna.style.left = mx + 'vw'; luna.style.top = my + 'vh';
       luna.style.opacity = Math.min(1, (h - 18.6) / 0.6);
     } else luna.style.opacity = 0;
-    root.classList.toggle('eclipse', Math.abs(h - 19.63) < 0.42);
+    root.classList.toggle('eclipse', Math.abs(h - 19.63) < 0.5);
 
     /* moth: awake after 21h, orbits near the moon */
     if (!reduced && h > 21) {
@@ -143,7 +158,10 @@
     else root.classList.toggle('lens');   // quick tap toggles, hold is momentary
   };
   sello.addEventListener('pointerup', release);
-  sello.addEventListener('pointercancel', () => { clearTimeout(holdTimer); });
+  sello.addEventListener('pointercancel', () => {
+    clearTimeout(holdTimer);
+    if (held) { held = false; root.classList.remove('lens'); }
+  });
   addEventListener('keydown', e => { if (e.key === 'm') root.classList.toggle('lens'); });
 
   /* ---------- reveals ---------- */
