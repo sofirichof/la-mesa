@@ -37,14 +37,6 @@
   const moth = document.getElementById('polilla');
   const zones = [...document.querySelectorAll('.hora')];
 
-  const nymRays = document.getElementById('nym-rays');
-  if (nymRays) for (let i = 0; i < 12; i++) {
-    const p = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-    p.setAttribute('points', '60,2 65,26 55,26');
-    p.setAttribute('transform', `rotate(${i * 30} 60 60)`);
-    nymRays.appendChild(p);
-  }
-
   function fmtHour(h) {
     const hh = Math.floor(h) % 24, mm = Math.round((h % 1) * 60) % 60;
     return String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0');
