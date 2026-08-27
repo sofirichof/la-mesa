@@ -238,6 +238,15 @@ body.noche .sheet td:nth-child(3){color:#9FB0E8}
 .nota-mini{display:flex; flex-wrap:wrap; gap:6px 14px; border-top:1px solid var(--rule); padding-top:10px;
   font-family:'Space Mono',monospace; font-size:10px; letter-spacing:.06em; color:var(--amb-dim)}
 
+/* the full record leans right, with a scrim so it reads over anything */
+#h-registro .col.ancha{margin-left:auto; margin-right:max(24px, 5vw); max-width:760px}
+#h-registro .marca, #h-registro h2{text-align:right}
+#h-registro .sheet{
+  background:linear-gradient(90deg, rgba(9,12,30,0), rgba(9,12,30,.72) 14%, rgba(9,12,30,.86));
+  padding:6px 18px 10px 26px; border-top:none;
+}
+#h-registro .sheet table{border-top:2px solid var(--amb)}
+
 /* midnight city dots */
 #h-fondo{position:relative}
 #h-fondo::before{

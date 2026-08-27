@@ -88,30 +88,41 @@
     const zc = zones[Math.min(k, zones.length - 1)];
     relojL.textContent = zc.dataset[esOn() ? 'labelEs' : 'labelEn'] || zc.dataset.labelEn;
 
-    /* the sun */
-    const sunUp = h >= 6 && h <= 20.4;
-    if (sunUp) {
-      const sp = (h - 6.2) / (20.2 - 6.2);
-      let sx = lerp(10, 90, sp);
-      let sy = 78 - Math.sin(Math.PI * Math.min(1, Math.max(0, sp))) * 64;
-      const ec = ease(1 - Math.min(1, Math.abs(h - 19.63) / 0.55));
-      if (ec > 0) { sx = lerp(sx, 50, ec); sy = lerp(sy, 38, ec); }
+    /* keyframe track: [hour, x, y] with smooth easing between stops */
+    const track = (hh, kfs) => {
+      if (hh <= kfs[0][0]) return [kfs[0][1], kfs[0][2]];
+      const last = kfs[kfs.length - 1];
+      if (hh >= last[0]) return [last[1], last[2]];
+      let s = 0;
+      while (s < kfs.length - 2 && hh > kfs[s + 1][0]) s++;
+      const a = kfs[s], b = kfs[s + 1];
+      const u = ease((hh - a[0]) / (b[0] - a[0]));
+      return [lerp(a[1], b[1], u), lerp(a[2], b[2], u)];
+    };
+
+    /* the sun: natural arc all day, then eases up to the meeting point,
+       holds through the eclipse, and sinks away through the moon */
+    if (h >= 6 && h <= 20.5) {
+      let sx, sy;
+      if (h < 18.5) {
+        const sp = (h - 6.2) / (20.2 - 6.2);
+        sx = lerp(10, 90, sp);
+        sy = 78 - Math.sin(Math.PI * Math.min(1, Math.max(0, sp))) * 64;
+      } else {
+        [sx, sy] = track(h, [[18.5, 80.3, 54.2], [19.55, 50, 38], [19.9, 50, 38], [20.5, 50, 88]]);
+      }
       sol.style.left = sx + 'vw'; sol.style.top = sy + 'vh';
-      sol.style.opacity = h > 19.9 ? Math.max(0, 1 - (h - 19.9) / 0.5) : 1;
+      sol.style.opacity = h > 19.95 ? Math.max(0, 1 - (h - 19.95) / 0.45) : 1;
     } else sol.style.opacity = 0;
 
-    /* the moon */
-    const moonUp = h >= 18.6;
-    if (moonUp) {
-      const mp = Math.min(1, (h - 18.6) / (25.5 - 18.6));
-      let mx = lerp(96, 50, Math.pow(mp, 0.8));
-      let my = lerp(80, 18, Math.sin(mp * Math.PI / 2));
-      const ec = ease(1 - Math.min(1, Math.abs(h - 19.63) / 0.55));
-      if (ec > 0) { mx = lerp(mx, 50, ec); my = lerp(my, 38, ec); }
+    /* the moon: one clean rising path whose route passes through the
+       meeting point — it swallows the sun and keeps climbing */
+    if (h >= 18.6) {
+      const [mx, my] = track(h, [[18.6, 97, 82], [19.63, 50, 38], [20.0, 50, 38], [21.8, 45, 24], [25.5, 50, 16]]);
       luna.style.left = mx + 'vw'; luna.style.top = my + 'vh';
-      luna.style.opacity = Math.min(1, (h - 18.6) / 0.6);
+      luna.style.opacity = Math.min(1, (h - 18.6) / 0.5);
     } else luna.style.opacity = 0;
-    root.classList.toggle('eclipse', Math.abs(h - 19.63) < 0.5);
+    root.classList.toggle('eclipse', h >= 19.35 && h <= 20.05);
 
     /* moth: awake after 21h */
     if (!reduced && h > 21) {
